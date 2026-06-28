@@ -912,6 +912,22 @@
     margin-bottom:16px;
   }
   .cart-subtotal .amt{color:var(--ruby-deep); font-weight:500;}
+  .continue-shopping-btn{
+    width:100%;
+    background:var(--cream);
+    color:var(--ruby-deep);
+    border:1px solid var(--ruby-deep);
+    padding:14px 0;
+    border-radius:30px;
+    font-size:0.95rem;
+    letter-spacing:0.02em;
+    transition:background .2s;
+    margin-bottom:8px;
+    cursor:pointer;
+  }
+  .continue-shopping-btn:hover{
+    background:var(--blush-deep);
+  }
   .checkout-btn{
     width:100%;
     background:var(--ruby);
@@ -1181,6 +1197,7 @@
       <textarea id="custAddress" placeholder="Full address (city, area, street, landmark)" class="cart-input cart-textarea"></textarea>
     </div>
     <div class="cart-subtotal"><span>Total</span><span class="amt" id="cartTotal">0 EGP</span></div>
+    <button class="continue-shopping-btn" id="continueShoppingBtn">Continue Shopping</button>
     <button class="checkout-btn" id="checkoutBtn">Send Order on WhatsApp</button>
     <div class="secure-note">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="9" width="16" height="11" rx="2"/><path d="M8 9V6a4 4 0 018 0v3"/></svg>
@@ -1333,6 +1350,33 @@ let state = {
   view: 'home'
 };
 let cart = [];
+
+/* ========== حفظ واستعادة السلة ========== */
+function saveCartToStorage() {
+  localStorage.setItem('rubies_cart', JSON.stringify(cart));
+}
+
+function loadCartFromStorage() {
+  const saved = localStorage.getItem('rubies_cart');
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) {
+        cart = parsed;
+        // التأكد من أن كل عنصر له صورة صالحة
+        cart.forEach(c => {
+          if (!c.img || c.img === '') {
+            const product = PRODUCTS.find(p => p.id === c.id);
+            if (product && product.img) c.img = product.img;
+          }
+        });
+      }
+    } catch(e) {
+      // في حالة وجود خطأ في البيانات المخزنة، نبدأ بسلة فارغة
+      cart = [];
+    }
+  }
+}
 
 function getProductMinPrice(p){
   if(p.sizePrices) return Math.min(...Object.values(p.sizePrices));
@@ -1785,35 +1829,36 @@ function renderCart(){
   if(!cart.length){
     wrap.innerHTML = '<div class="cart-empty">Your cart is empty.<br>Now\'s a good time to add a piece you love.</div>';
     totalEl.textContent = '0 EGP';
-    return;
-  }
-  wrap.innerHTML = cart.map((c,idx) => {
-    let variant = '';
-    if (c.type) variant += `Type: ${c.type} | `;
-    if (c.color === 'Customized' && c.notes) {
-      variant += `Size: ${c.size} | Customized: ${c.notes}`;
-    } else {
-      variant += `Size: ${c.size} | Color: ${c.color}`;
-    }
-    return `
-    <div class="cart-item">
-      <img src="${c.img}" alt="${c.name}">
-      <div class="cart-item-info">
-        <h5>${c.name}</h5>
-        <div>${c.price.toLocaleString('en-US')} EGP</div>
-        <div class="variant">${variant}</div>
-        <div class="qty-row">
-          <button class="qty-btn" data-act="dec" data-idx="${idx}">−</button>
-          <span>${c.qty}</span>
-          <button class="qty-btn" data-act="inc" data-idx="${idx}">+</button>
+  } else {
+    wrap.innerHTML = cart.map((c,idx) => {
+      let variant = '';
+      if (c.type) variant += `Type: ${c.type} | `;
+      if (c.color === 'Customized' && c.notes) {
+        variant += `Size: ${c.size} | Customized: ${c.notes}`;
+      } else {
+        variant += `Size: ${c.size} | Color: ${c.color}`;
+      }
+      return `
+      <div class="cart-item">
+        <img src="${c.img}" alt="${c.name}">
+        <div class="cart-item-info">
+          <h5>${c.name}</h5>
+          <div>${c.price.toLocaleString('en-US')} EGP</div>
+          <div class="variant">${variant}</div>
+          <div class="qty-row">
+            <button class="qty-btn" data-act="dec" data-idx="${idx}">−</button>
+            <span>${c.qty}</span>
+            <button class="qty-btn" data-act="inc" data-idx="${idx}">+</button>
+          </div>
         </div>
-      </div>
-    </div>`;
-  }).join('');
-  wrap.querySelectorAll('.qty-btn').forEach(btn => {
-    btn.addEventListener('click', () => changeQty(parseInt(btn.dataset.idx), btn.dataset.act==='inc'?1:-1));
-  });
-  totalEl.textContent = cart.reduce((s,c) => s + c.price*c.qty, 0).toLocaleString('en-US') + ' EGP';
+      </div>`;
+    }).join('');
+    wrap.querySelectorAll('.qty-btn').forEach(btn => {
+      btn.addEventListener('click', () => changeQty(parseInt(btn.dataset.idx), btn.dataset.act==='inc'?1:-1));
+    });
+    totalEl.textContent = cart.reduce((s,c) => s + c.price*c.qty, 0).toLocaleString('en-US') + ' EGP';
+  }
+  saveCartToStorage(); /* حفظ السلة تلقائياً */
 }
 
 function openCart(){ document.getElementById('cartDrawer').classList.add('show'); document.getElementById('overlay').classList.add('show'); }
@@ -1821,6 +1866,11 @@ function closeCartFn(){ document.getElementById('cartDrawer').classList.remove('
 document.getElementById('cartBtn').addEventListener('click', openCart);
 document.getElementById('closeCart').addEventListener('click', closeCartFn);
 document.getElementById('overlay').addEventListener('click', ()=>{ closeCartFn(); closeMobileFilter(); });
+
+document.getElementById('continueShoppingBtn').addEventListener('click', () => {
+  closeCartFn();
+  goHome();
+});
 
 const WHATSAPP_NUMBER = '201201828084';
 document.getElementById('checkoutBtn').addEventListener('click', () => {
@@ -1845,6 +1895,9 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
 function openMobileFilter(){ document.getElementById('sidebar').classList.add('show'); document.getElementById('overlay').classList.add('show'); }
 function closeMobileFilter(){ document.getElementById('sidebar').classList.remove('show'); if(!document.getElementById('cartDrawer').classList.contains('show')) document.getElementById('overlay').classList.remove('show'); }
 document.getElementById('mobileFilterOpen').addEventListener('click', openMobileFilter);
+
+/* تحميل السلة المحفوظة قبل بدء التطبيق */
+loadCartFromStorage();
 
 renderHomeSections();
 setupScrollOnce();
