@@ -1329,6 +1329,20 @@ let state = {
 };
 let cart = [];
 
+function beforeUnloadHandler(e) {
+  e.preventDefault();
+  e.returnValue = 'You have items in your cart. Are you sure you want to leave?';
+  return e.returnValue;
+}
+
+function updateBeforeUnload() {
+  if (cart.length > 0) {
+    window.addEventListener('beforeunload', beforeUnloadHandler);
+  } else {
+    window.removeEventListener('beforeunload', beforeUnloadHandler);
+  }
+}
+
 const announceMsgs = ['Free delivery on orders over 1,000 EGP ✨','New arrivals every week 🌸','Free delivery on orders over 1,000 EGP ✨','New arrivals every week 🌸'];
 document.getElementById('announceTrack').innerHTML = [...announceMsgs, ...announceMsgs].map(m => `<span>${m}</span>`).join('');
 
@@ -1714,31 +1728,32 @@ function renderCart(){
   if(!cart.length){
     wrap.innerHTML = '<div class="cart-empty">Your cart is empty.<br>Now\'s a good time to add a piece you love.</div>';
     totalEl.textContent = '0 EGP';
-    return;
-  }
-  wrap.innerHTML = cart.map((c,idx) => {
-    const variant = c.color === 'Customized' && c.notes ? 
-      `Size: ${c.size} | Customized: ${c.notes}` : 
-      `Size: ${c.size} | Color: ${c.color}`;
-    return `
-    <div class="cart-item">
-      <img src="${c.img}" alt="${c.name}">
-      <div class="cart-item-info">
-        <h5>${c.name}</h5>
-        <div>${c.price.toLocaleString('en-US')} EGP</div>
-        <div class="variant">${variant}</div>
-        <div class="qty-row">
-          <button class="qty-btn" data-act="dec" data-idx="${idx}">−</button>
-          <span>${c.qty}</span>
-          <button class="qty-btn" data-act="inc" data-idx="${idx}">+</button>
+  } else {
+    wrap.innerHTML = cart.map((c,idx) => {
+      const variant = c.color === 'Customized' && c.notes ? 
+        `Size: ${c.size} | Customized: ${c.notes}` : 
+        `Size: ${c.size} | Color: ${c.color}`;
+      return `
+      <div class="cart-item">
+        <img src="${c.img}" alt="${c.name}">
+        <div class="cart-item-info">
+          <h5>${c.name}</h5>
+          <div>${c.price.toLocaleString('en-US')} EGP</div>
+          <div class="variant">${variant}</div>
+          <div class="qty-row">
+            <button class="qty-btn" data-act="dec" data-idx="${idx}">−</button>
+            <span>${c.qty}</span>
+            <button class="qty-btn" data-act="inc" data-idx="${idx}">+</button>
+          </div>
         </div>
-      </div>
-    </div>`;
-  }).join('');
-  wrap.querySelectorAll('.qty-btn').forEach(btn => {
-    btn.addEventListener('click', () => changeQty(parseInt(btn.dataset.idx), btn.dataset.act==='inc'?1:-1));
-  });
-  totalEl.textContent = cart.reduce((s,c) => s + c.price*c.qty, 0).toLocaleString('en-US') + ' EGP';
+      </div>`;
+    }).join('');
+    wrap.querySelectorAll('.qty-btn').forEach(btn => {
+      btn.addEventListener('click', () => changeQty(parseInt(btn.dataset.idx), btn.dataset.act==='inc'?1:-1));
+    });
+    totalEl.textContent = cart.reduce((s,c) => s + c.price*c.qty, 0).toLocaleString('en-US') + ' EGP';
+  }
+  updateBeforeUnload();
 }
 
 function openCart(){ document.getElementById('cartDrawer').classList.add('show'); document.getElementById('overlay').classList.add('show'); }
