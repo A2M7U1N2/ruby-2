@@ -79,7 +79,7 @@
   .announce-track{
     display:flex;
     white-space:nowrap;
-    animation:scrollbar 20s linear infinite;
+    animation:scrollbar 10s linear infinite;
     gap:48px;
   }
   .announce-track span{display:flex;align-items:center;gap:10px;font-weight:500;}
@@ -543,15 +543,46 @@
     background:var(--blush-deep);
     border-radius:28px;
     display:flex;
+    flex-direction:column;
     align-items:center;
     justify-content:center;
     padding:20px;
+    position:relative;
+    overflow:hidden;
   }
-  .detail-img-col img{
+  /* ===== معرض الصور (slider) ===== */
+  .slider-container{
     width:100%;
-    max-height:600px;
+    position:relative;
+    overflow:hidden;
+    border-radius:18px;
+  }
+  .slider-track{
+    display:flex;
+    transition:transform 0.3s ease;
+    touch-action:pan-y;
+  }
+  .slider-track img{
+    width:100%;
+    flex-shrink:0;
     object-fit:cover;
     border-radius:18px;
+  }
+  .slider-dots{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin-top:14px;
+  }
+  .slider-dot{
+    width:10px;height:10px;
+    border-radius:50%;
+    background:var(--rose-soft);
+    transition:background 0.2s;
+    cursor:pointer;
+  }
+  .slider-dot.active{
+    background:var(--ruby);
   }
   .detail-info-col{
     flex:1 1 300px;
@@ -626,6 +657,49 @@
     text-align:center;
   }
   .detail-add-to-cart:hover{background:var(--ruby-deep);}
+
+  /* ===== خيار Customized in Notes ===== */
+  .customized-option{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    cursor:pointer;
+    font-size:0.9rem;
+    color:var(--ink);
+    margin-top:4px;
+  }
+  .customized-check{
+    width:20px;height:20px;
+    border:2px solid var(--line);
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:all 0.2s;
+  }
+  .customized-check.checked{
+    background:var(--ruby);
+    border-color:var(--ruby);
+  }
+  .customized-check.checked::after{
+    content:'✓';
+    color:#fff;
+    font-size:13px;
+    font-weight:bold;
+  }
+  .customization-notes{
+    font-family:'Jost',sans-serif;
+    width:100%;
+    padding:10px 14px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:var(--cream);
+    color:var(--ink);
+    font-size:0.9rem;
+    resize:vertical;
+    min-height:80px;
+    margin-top:8px;
+  }
 
   .empty-state{
     grid-column:1/-1;
@@ -946,7 +1020,6 @@
 
 <!-- صفحة المتجر الرئيسية -->
 <div id="shopPage">
-  <!-- أقسام الصفحة الرئيسية الجديدة -->
   <div id="homeSections">
     <div class="home-section">
       <h2 class="section-title">Best Sellers</h2>
@@ -1023,7 +1096,10 @@
   <div class="back-btn" id="backToShopBtn">← Back</div>
   <div class="product-detail-layout">
     <div class="detail-img-col">
-      <img id="detailImg" src="" alt="Product Image">
+      <div class="slider-container" id="sliderContainer">
+        <div class="slider-track" id="sliderTrack"></div>
+      </div>
+      <div class="slider-dots" id="sliderDots"></div>
     </div>
     <div class="detail-info-col">
       <div class="detail-cat" id="detailCat"></div>
@@ -1037,6 +1113,12 @@
         <div class="detail-size-label">Select Color</div>
         <div class="detail-colors" id="detailColorSwatches"></div>
       </div>
+      <!-- خيار التخصيص -->
+      <div class="customized-option" id="customizedOption">
+        <div class="customized-check" id="customizedCheck"></div>
+        <span>Customized in Notes</span>
+      </div>
+      <textarea class="customization-notes" id="customizationNotes" placeholder="Write your customization details here..." style="display:none;"></textarea>
       <button class="detail-add-to-cart" id="detailAddToCartBtn">Add to Cart</button>
     </div>
   </div>
@@ -1202,16 +1284,20 @@ const PRODUCTS = [
     colorImages: { 0: 'https://via.placeholder.com/500x590/1a1a1a/fff?text=Black', 1: 'https://via.placeholder.com/500x590/f5f5f5/000?text=White', 4: 'https://via.placeholder.com/500x590/d43d3d/fff?text=Red', 5: 'https://via.placeholder.com/500x590/4a7ebd/fff?text=Blue' },
     badge:null, date:8
   },
-  { id:9, name:'Orange Strap', cat:'Phone strap', price:280, oldPrice:null,
-    colors:[3], sizes:['One size'],
-    img: ph(9,'#ff8c42','#f5d547'),
-    colorImages: { 3: 'https://via.placeholder.com/500x590/ff8c42/fff?text=Orange+Strap' },
-    badge:null, date:9
+  { id:9, name:'Cross Phone Strap', cat:'Phone strap', price:100, oldPrice:120,
+    colors:[1,2,3,4,5,7,8], sizes:['100 cm','120 cm','140 cm'],
+    img: 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%205.10.15%20AM.jpeg',
+    extraImages: [
+      'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%205.10.15%20AM.jpeg',
+      'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%205.10.15%20AM%20(1).jpeg',
+      'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%205.10.15%20AM%20(1).jpeg'
+    ],
+    badge:'Best Seller', date:9
   },
   { id:10, name:'Pink Strap', cat:'Phone strap', price:320, oldPrice:360,
-    colors:[8,2], sizes:['One size'],
-    img: ph(10,'#f0a5c0','#ff69b4'),
-    colorImages: { 8: 'https://via.placeholder.com/500x590/f0a5c0/fff?text=Pink', 2: 'https://via.placeholder.com/500x590/ff69b4/fff?text=Hot+Pink' },
+    colors:[1,2,3,4,5,7,8], sizes:['One size'],
+    img: '',
+    colorImages: {},
     badge:'Sale', date:10
   },
 ];
@@ -1221,16 +1307,15 @@ let state = {
   maxPrice: 700,
   stock: 'all',
   sort: 'featured',
-  view: 'home' // 'home' or 'category'
+  view: 'home'
 };
 let cart = [];
 
-const announceMsgs = ['Free delivery on orders over 1,000 EGP ✨','New arrivals every week 🌸','Handmade with love in Egypt 🤍','Free delivery on orders over 1,000 EGP ✨'];
+const announceMsgs = ['Free delivery on orders over 1,000 EGP ✨','New arrivals every week 🌸','Free delivery on orders over 1,000 EGP ✨','New arrivals every week 🌸'];
 document.getElementById('announceTrack').innerHTML = [...announceMsgs, ...announceMsgs].map(m => `<span>${m}</span>`).join('');
 
 // ========== تهيئة الأقسام الرئيسية ==========
 function renderHomeSections() {
-  // Best Sellers - عرض أول 6 منتجات متاحة
   const bestSellers = PRODUCTS.filter(p => !p.soldOut).slice(0, 6);
   const bestRow = document.getElementById('bestSellerRow');
   bestRow.innerHTML = bestSellers.map(p => {
@@ -1258,7 +1343,6 @@ function renderHomeSections() {
     });
   });
 
-  // Categories
   const categoryRow = document.getElementById('categoryRow');
   categoryRow.innerHTML = CATEGORIES.map(cat => {
     const imgSrc = `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="300" height="375"><rect width="300" height="375" fill="${getCategoryColor(cat)}"/><text x="150" y="190" font-family="Georgia" font-size="20" fill="#8B3A42" text-anchor="middle">${cat}</text></svg>`)}`;
@@ -1277,7 +1361,6 @@ function renderHomeSections() {
   });
 }
 
-// تفعيل السهم مرة واحدة فقط
 let arrowsInitialized = false;
 function setupScrollOnce() {
   if (arrowsInitialized) return;
@@ -1303,8 +1386,8 @@ function setupScroll(rowId, leftBtnId, rightBtnId) {
 // ========== التنقل إلى صفحة القسم ==========
 function showCategoryProducts(cat) {
   state.category = cat;
-  state.maxPrice = 700; // إعادة تعيين السعر
-  state.stock = 'all'; // إعادة تعيين التوفر
+  state.maxPrice = 700;
+  state.stock = 'all';
   state.view = 'category';
   
   document.getElementById('homeSections').style.display = 'none';
@@ -1312,7 +1395,6 @@ function showCategoryProducts(cat) {
   document.getElementById('pageTitle').textContent = cat;
   document.getElementById('breadcrumbCat').textContent = cat;
   
-  // إعادة ضبط الفلاتر في الـ sidebar
   document.getElementById('priceRange').value = 700;
   document.getElementById('priceMax').textContent = '700 EGP';
   document.querySelectorAll('.filter-toggle').forEach(b => b.classList.remove('active'));
@@ -1435,10 +1517,16 @@ function renderProducts(){
 // ========== تفاصيل المنتج ==========
 let currentDetailProduct = null;
 let currentDetailSelectedColor = 0;
+let isCustomized = false;
+let sliderImages = [];
+let currentSlide = 0;
+let touchStartX = 0;
+let touchEndX = 0;
 
 function openProductPage(product){
   currentDetailProduct = product;
   currentDetailSelectedColor = product.colors[0];
+  isCustomized = false;
   
   document.getElementById('detailCat').textContent = product.cat;
   document.getElementById('detailName').textContent = bagName(product);
@@ -1458,7 +1546,19 @@ function openProductPage(product){
     return `<button class="detail-color-swatch ${selectedClass}" style="background:${COLORS[colorIdx].hex}" data-color="${colorIdx}" title="${COLORS[colorIdx].name}"></button>`;
   }).join('');
   
-  updateDetailImage();
+  // إعادة ضبط خيار التخصيص
+  document.getElementById('customizedCheck').classList.remove('checked');
+  document.getElementById('customizationNotes').style.display = 'none';
+  document.getElementById('customizationNotes').value = '';
+  
+  // تجهيز الصور
+  if(product.extraImages && product.extraImages.length > 0){
+    sliderImages = product.extraImages;
+  } else {
+    sliderImages = [product.colorImages?.[currentDetailSelectedColor] || product.img];
+  }
+  currentSlide = 0;
+  renderSlider();
   
   document.getElementById('shopPage').style.display = 'none';
   document.getElementById('productDetailPage').classList.add('show');
@@ -1467,21 +1567,85 @@ function openProductPage(product){
   
   colorContainer.querySelectorAll('.detail-color-swatch').forEach(btn => {
     btn.addEventListener('click', () => {
+      if(isCustomized) return; // لا تغيير للون إذا كان مخصصاً
       const colorIdx = parseInt(btn.dataset.color);
       currentDetailSelectedColor = colorIdx;
       colorContainer.querySelectorAll('.detail-color-swatch').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
-      updateDetailImage();
+      if(!product.extraImages || product.extraImages.length === 0){
+        sliderImages = [product.colorImages?.[colorIdx] || product.img];
+        currentSlide = 0;
+        renderSlider();
+      }
     });
+  });
+  
+  // حدث خيار التخصيص
+  document.getElementById('customizedOption').onclick = () => {
+    isCustomized = !isCustomized;
+    const check = document.getElementById('customizedCheck');
+    const notesField = document.getElementById('customizationNotes');
+    if(isCustomized){
+      check.classList.add('checked');
+      notesField.style.display = 'block';
+      // إلغاء تحديد الألوان
+      document.querySelectorAll('.detail-color-swatch').forEach(b => b.classList.remove('selected'));
+    } else {
+      check.classList.remove('checked');
+      notesField.style.display = 'none';
+      // إعادة تحديد اللون الأول
+      const firstSwatch = document.querySelector(`.detail-color-swatch[data-color="${currentDetailSelectedColor}"]`);
+      if(firstSwatch) firstSwatch.classList.add('selected');
+    }
+  };
+}
+
+function renderSlider(){
+  const track = document.getElementById('sliderTrack');
+  const dotsContainer = document.getElementById('sliderDots');
+  
+  track.innerHTML = sliderImages.map(src => `<img src="${src}" alt="Product image">`).join('');
+  track.style.transform = `translateX(-${currentSlide * 100}%)`;
+  
+  dotsContainer.innerHTML = sliderImages.map((_, i) => 
+    `<span class="slider-dot ${i === currentSlide ? 'active' : ''}" data-index="${i}"></span>`
+  ).join('');
+  
+  dotsContainer.querySelectorAll('.slider-dot').forEach(dot => {
+    dot.addEventListener('click', () => {
+      currentSlide = parseInt(dot.dataset.index);
+      updateSliderPosition();
+    });
+  });
+  
+  track.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, {passive: true});
+  
+  track.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  }, {passive: true});
+}
+
+function updateSliderPosition(){
+  const track = document.getElementById('sliderTrack');
+  track.style.transform = `translateX(-${currentSlide * 100}%)`;
+  document.querySelectorAll('.slider-dot').forEach((dot, i) => {
+    dot.classList.toggle('active', i === currentSlide);
   });
 }
 
-function updateDetailImage(){
-  const img = document.getElementById('detailImg');
-  const product = currentDetailProduct;
-  const colorIdx = currentDetailSelectedColor;
-  const colorImages = product.colorImages || {};
-  img.src = colorImages[colorIdx] || product.img;
+function handleSwipe(){
+  const diff = touchStartX - touchEndX;
+  if(Math.abs(diff) > 50){
+    if(diff > 0 && currentSlide < sliderImages.length - 1){
+      currentSlide++;
+    } else if(diff < 0 && currentSlide > 0){
+      currentSlide--;
+    }
+    updateSliderPosition();
+  }
 }
 
 document.getElementById('backToShopBtn').addEventListener('click', () => {
@@ -1509,18 +1673,20 @@ document.getElementById('detailAddToCartBtn').addEventListener('click', () => {
   const product = currentDetailProduct;
   if(!product) return;
   const size = document.getElementById('detailSizeSelect').value;
-  const colorName = COLORS[currentDetailSelectedColor].name;
-  const imgSrc = document.getElementById('detailImg').src;
-  addToCart(product.id, size, colorName, imgSrc);
+  const colorName = isCustomized ? 'Customized' : COLORS[currentDetailSelectedColor].name;
+  const imgSrc = sliderImages[currentSlide] || sliderImages[0];
+  const customizationNotes = isCustomized ? document.getElementById('customizationNotes').value : '';
+  
+  addToCart(product.id, size, colorName, imgSrc, customizationNotes);
 });
 
 // ========== السلة ==========
-function addToCart(productId, size, color, imageSrc){
+function addToCart(productId, size, color, imageSrc, notes = ''){
   const product = PRODUCTS.find(p => p.id === productId);
   if(!product || product.soldOut) return;
-  const existing = cart.find(c => c.id === productId && c.size === size && c.color === color);
+  const existing = cart.find(c => c.id === productId && c.size === size && c.color === color && c.notes === notes);
   if(existing) existing.qty++;
-  else cart.push({ id:product.id, cat:product.cat, price:product.price, img:imageSrc, name:bagName(product), size, color, qty:1 });
+  else cart.push({ id:product.id, cat:product.cat, price:product.price, img:imageSrc, name:bagName(product), size, color, qty:1, notes });
   renderCart();
   openCart();
 }
@@ -1542,20 +1708,25 @@ function renderCart(){
     totalEl.textContent = '0 EGP';
     return;
   }
-  wrap.innerHTML = cart.map((c,idx) => `
+  wrap.innerHTML = cart.map((c,idx) => {
+    const variant = c.color === 'Customized' && c.notes ? 
+      `Size: ${c.size} | Customized: ${c.notes}` : 
+      `Size: ${c.size} | Color: ${c.color}`;
+    return `
     <div class="cart-item">
       <img src="${c.img}" alt="${c.name}">
       <div class="cart-item-info">
         <h5>${c.name}</h5>
         <div>${c.price.toLocaleString('en-US')} EGP</div>
-        <div class="variant">Size: ${c.size} | Color: ${c.color}</div>
+        <div class="variant">${variant}</div>
         <div class="qty-row">
           <button class="qty-btn" data-act="dec" data-idx="${idx}">−</button>
           <span>${c.qty}</span>
           <button class="qty-btn" data-act="inc" data-idx="${idx}">+</button>
         </div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   wrap.querySelectorAll('.qty-btn').forEach(btn => {
     btn.addEventListener('click', () => changeQty(parseInt(btn.dataset.idx), btn.dataset.act==='inc'?1:-1));
   });
@@ -1577,7 +1748,11 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
   if(!name||!phone||!address){ alert('Please fill in your details.'); return; }
   const total = cart.reduce((s,c) => s + c.price*c.qty, 0);
   let msg = `Hi, I'd like to confirm the following order from Rubies:\n\n`;
-  cart.forEach((c,i) => msg += `${i+1}) ${c.name}\n   Size: ${c.size} | Color: ${c.color}\n   Qty: ${c.qty}\n   Price: ${(c.price*c.qty).toLocaleString('en-US')} EGP\n\n`);
+  cart.forEach((c,i) => {
+    msg += `${i+1}) ${c.name}\n   Size: ${c.size} | Color: ${c.color}\n   Qty: ${c.qty}\n   Price: ${(c.price*c.qty).toLocaleString('en-US')} EGP\n`;
+    if(c.notes) msg += `   Customization: ${c.notes}\n`;
+    msg += `\n`;
+  });
   msg += `Total: ${total.toLocaleString('en-US')} EGP\n\nName: ${name}\nPhone: ${phone}\nAddress: ${address}\n\nNote: all sales are final, no refunds.\nWaiting for confirmation on payment.`;
   window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
 });
