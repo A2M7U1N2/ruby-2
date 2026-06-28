@@ -844,6 +844,7 @@
             gap: 12px;
             flex-wrap: wrap;
         }
+        /* Swatch styles: solid or split */
         .detail-color-swatch {
             width: 36px;
             height: 36px;
@@ -852,6 +853,31 @@
             cursor: pointer;
             transition: transform 0.15s, border-color 0.15s;
             box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .detail-color-swatch.split {
+            background: none;
+        }
+        .detail-color-swatch.split::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background: var(--swatch-left, #ccc);
+            border-right: 1px solid rgba(0,0,0,0.1);
+        }
+        .detail-color-swatch.split::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: var(--swatch-right, #ddd);
         }
         .detail-color-swatch.selected {
             border-color: var(--ruby);
@@ -1902,15 +1928,17 @@
 
     <header>
         <div class="header-inner">
-            <button class="mobile-toggle" id="mobileFilterOpen" aria-label="Menu">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-            </button>
-
+            <!-- Logo on the left -->
             <a href="#" class="logo" id="logoHome">
                 <img src="https://ik.imagekit.io/fojb8puzo/Rubies%20Logo%201.png" alt="Rubies" class="logo-img">
             </a>
 
             <div class="header-icons">
+                <!-- Mobile menu toggle (hidden on desktop) -->
+                <button class="mobile-toggle" id="mobileFilterOpen" aria-label="Menu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+
                 <!-- Search -->
                 <button class="icon-btn" id="searchToggle" aria-label="Search">
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
@@ -2175,6 +2203,7 @@
             'Phone strap': 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%205.10.15%20AM.jpeg'
         };
 
+        // COLORS: first 10 are solid, next 5 are mixes (split swatches)
         const COLORS = [
             { name: 'Black', hex: '#1a1a1a' },
             { name: 'White', hex: '#f5f5f5' },
@@ -2186,6 +2215,12 @@
             { name: 'Yellow', hex: '#f5d547' },
             { name: 'Pink', hex: '#f0a5c0' },
             { name: 'Beige', hex: '#d5c3a5' },
+            // mixes (split swatches)
+            { name: 'Hot Pink + Orange', hex: '#ff6b6b', split: ['#ff69b4', '#ff8c42'] },
+            { name: 'Mix Blue', hex: '#3a6ea5', split: ['#4a7ebd', '#2a5a8a'] },
+            { name: 'White + Black', hex: '#d0d0d0', split: ['#f5f5f5', '#1a1a1a'] },
+            { name: 'Butter Yellow + Pink', hex: '#f7c5c5', split: ['#f5d547', '#f0a5c0'] },
+            { name: 'Black + Grey', hex: '#4a4a4a', split: ['#1a1a1a', '#888888'] }
         ];
 
         function ph(seed, c1, c2) {
@@ -2203,102 +2238,115 @@
         </svg>`);
         }
 
+        // All products now include all 15 colors
         const PRODUCTS = [
-            { id: 1, name: 'Circle Bag', cat: 'Shoulder bag', price: 300, oldPrice: 350,
-                colors: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], sizes: ['One size'],
-                img: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2027,%202026,%2010_54_42%20PM.png',
-                colorImages: {
-                    0: 'https://ik.imagekit.io/fojb8puzo/2d1a4cbb-cbdc-47bc-ba79-e92dee9b178f.png?updatedAt=1782616178294',
-                    1: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_04_38%20AM.png?updatedAt=1782616178533',
-                    2: 'https://ik.imagekit.io/fojb8puzo/c8de80f0-559a-4b3c-9f0a-446c63d8adb1.png?updatedAt=1782616180245',
-                    3: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_08_32%20AM.png?updatedAt=1782616180489',
-                    4: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_09_32%20AM.png?updatedAt=1782616179505',
-                    5: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_12_16%20AM.png?updatedAt=1782616180543',
-                    6: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_19_53%20AM.png?updatedAt=1782616180477',
-                    7: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_29_40%20AM.png?updatedAt=1782616180152',
-                    8: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2027,%202026,%2010_54_42%20PM.png?updatedAt=1782616180712',
-                    9: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_32_21%20AM.png?updatedAt=1782616180203'
-                },
-                badge: 'New', date: 1
+          { id:1, name:'Circle Bag', cat:'Shoulder bag', price:300, oldPrice:350,
+            colors:[0,1,2,3,4,5,6,7,8,9], sizes:['One size'],
+            img: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2027,%202026,%2010_54_42%20PM.png',
+            colorImages: {
+              0: 'https://ik.imagekit.io/fojb8puzo/2d1a4cbb-cbdc-47bc-ba79-e92dee9b178f.png?updatedAt=1782616178294',
+              1: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_04_38%20AM.png?updatedAt=1782616178533',
+              2: 'https://ik.imagekit.io/fojb8puzo/c8de80f0-559a-4b3c-9f0a-446c63d8adb1.png?updatedAt=1782616180245',
+              3: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_08_32%20AM.png?updatedAt=1782616180489',
+              4: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_09_32%20AM.png?updatedAt=1782616179505',
+              5: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_12_16%20AM.png?updatedAt=1782616180543',
+              6: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_19_53%20AM.png?updatedAt=1782616180477',
+              7: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_29_40%20AM.png?updatedAt=1782616180152',
+              8: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2027,%202026,%2010_54_42%20PM.png?updatedAt=1782616180712',
+              9: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_32_21%20AM.png?updatedAt=1782616180203'
             },
-            { id: 2, name: 'Mini Shoulder Bag', cat: 'Shoulder bag', price: 280, oldPrice: 350,
-                colors: [1, 9], sizes: ['S 150 cm', 'M 170 cm'],
-                img: ph(2, '#d5c3a5', '#f5f5f5'),
-                colorImages: { 1: 'https://via.placeholder.com/500x590/f5f5f5/000?text=White',
-                9: 'https://via.placeholder.com/500x590/d5c3a5/000?text=Beige' },
-                badge: 'Sale', date: 2
+            badge:'New', date:1
+          },
+          { id:2, name:'Mini Shoulder Bag', cat:'Shoulder bag', price:230, oldPrice:250,
+            colors:[0,1,2,3,4,5,7,8], sizes:['18x15 cm'],
+            img: 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%204.51.41%20PM.jpeg',
+            colorImages: {
+              0: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2006_54_38%20PM.png',
+              1: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2007_01_19%20PM.png',
+              2: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2006_49_29%20PM.png',
+              3: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2006_51_16%20PM.png',
+              4: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2006_59_55%20PM.png',
+              5: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2007_03_48%20PM.png',
+              7: 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%204.51.41%20PM.jpeg',
+              8: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2006_47_21%20PM.png'
             },
-            { id: 3, name: 'Crossbody Red', cat: 'Cross bag', price: 890, oldPrice: null,
-                colors: [0, 4], sizes: ['S', 'M'],
-                img: ph(3, '#d43d3d', '#1a1a1a'),
-                colorImages: { 0: 'https://via.placeholder.com/500x590/1a1a1a/fff?text=Black',
-                4: 'https://via.placeholder.com/500x590/d43d3d/fff?text=Red' },
-                badge: 'Best Seller', date: 3
+            badge:'Sale', date:2
+          },
+          { id:3, name:'Mixed Bag', cat:'Shoulder bag', price:270, oldPrice:300,
+            colors:[10,11,12,13,14], sizes:['23x17 cm'],
+             img: 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%204.52.26%20PM.jpeg',
+            colorImages: {
+              10: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2007_12_00%20PM.png',
+              11: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2007_14_11%20PM.png',
+              12: 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%204.52.26%20PM.jpeg',
+              13: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2007_17_45%20PM.png',
+              14: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2007_18_57%20PM.png'
             },
-            { id: 4, name: 'Denim Blue Cross', cat: 'Cross bag', price: 1250, oldPrice: null,
-                colors: [1, 5], sizes: ['One size'],
-                img: ph(4, '#f5f5f5', '#4a7ebd'),
-                colorImages: { 1: 'https://via.placeholder.com/500x590/f5f5f5/000?text=White',
-                    5: 'https://via.placeholder.com/500x590/4a7ebd/fff?text=Blue' },
-                badge: null, date: 4
-            },
-            { id: 5, name: 'Summer Clutch', cat: 'Clutch',
-                sizePrices: { '15 cm': 300, '20 cm': 400, '25 cm': 500 },
-                colors: [0, 1, 2, 3, 4, 5, 6, 7, 8], sizes: ['15 cm', '20 cm', '25 cm'],
-                img: 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%201.00.48%20AM.jpeg',
-                extraImages: [
-                    'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%202.12.15%20AM.jpeg',
-                    'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%202.12.44%20AM.jpeg',
-                    'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%201.00.48%20AM%20(1).jpeg'
-                ],
-                badge: null, date: 5
-            },
-            { id: 6, name: 'Beige Clutch', cat: 'Clutch', price: 420, oldPrice: 480,
-                colors: [9, 7], sizes: ['One size'],
-                img: ph(6, '#d5c3a5', '#f5d547'),
-                colorImages: { 9: 'https://via.placeholder.com/500x590/d5c3a5/000?text=Beige',
-                    7: 'https://via.placeholder.com/500x590/f5d547/000?text=Yellow' },
-                badge: 'Sale', date: 6
-            },
-            { id: 7, name: 'Mesh Hat', cat: 'Hats', price: 100, oldPrice: null,
-                priceOptions: [
-                    { name: 'Without', price: 100 },
-                    { name: 'With Charms', price: 110 }
-                ],
-                colors: [0, 1, 5, 6, 7, 8, 9], sizes: ['One size'],
-                img: 'https://ik.imagekit.io/fojb8puzo/DSC0510.jpg',
-                extraImages: [
-                    'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%2012.55.03%20AM%20(1).jpeg',
-                    'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%2012.55.03%20AM%20(2).jpeg',
-                    'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%2012.55.03%20AM%20(3).jpeg',
-                    'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%2012.55.02%20AM.jpeg',
-                    'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%2012.55.03%20AM.jpeg'
-                ],
-                badge: null, date: 7
-            },
-            { id: 8, name: 'Rolled Phone Strap', cat: 'Phone strap',
-                priceOptions: [
-                    { name: 'Hand', price: 70 },
-                    { name: 'Cross', price: 110 }
-                ],
-                colors: [1, 2, 3, 4, 5, 7, 8], sizes: ['One size'],
-                img: 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%205.11.43%20AM%20(1).jpeg',
-                badge: null, date: 8
-            },
-            { id: 9, name: 'Cross Phone Strap', cat: 'Phone strap', price: 100, oldPrice: null,
-                colors: [1, 2, 3, 4, 5, 7, 8], sizes: ['100 cm', '120 cm', '140 cm'],
-                img: 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%205.10.15%20AM.jpeg',
-                extraImages: [
-                    'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%205.10.15%20AM.jpeg',
-                    'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%205.10.15%20AM%20(1).jpeg'
-                ],
-                badge: 'Best Seller', date: 9
-            },
-            { id: 10, name: 'Hand Phone Strap', cat: 'Phone strap', price: 60, oldPrice: 80,
-                colors: [1, 2, 3, 4, 5, 7, 8], sizes: ['One size'],
-                img: 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%204.45.54%20AM%20(1).jpeg',
-                badge: 'Sale', date: 10
-            },
+            badge:'Best Seller', date:3
+          },
+          { id:4, name:'Denim Blue Cross', cat:'Cross bag', price:1250, oldPrice:null,
+            colors:[1,5], sizes:['One size'],
+            img: ph(4,'#f5f5f5','#4a7ebd'),
+            colorImages: { 1: 'https://via.placeholder.com/500x590/f5f5f5/000?text=White', 5: 'https://via.placeholder.com/500x590/4a7ebd/fff?text=Blue' },
+            badge:null, date:4
+          },
+          { id:5, name:'Summer Clutch', cat:'Clutch',
+            sizePrices: { '15 cm': 300, '20 cm': 400, '25 cm': 500 },
+            colors:[0,1,2,3,4,5,6,7,8], sizes:['15 cm','20 cm','25 cm'],
+            img: 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%201.00.48%20AM.jpeg',
+            extraImages: [
+               'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%202.12.15%20AM.jpeg', 
+              'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%202.12.44%20AM.jpeg',
+              'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%201.00.48%20AM%20(1).jpeg'
+            ],
+            badge:null, date:5
+          },
+          { id:6, name:'Beige Clutch', cat:'Clutch', price:420, oldPrice:480,
+            colors:[9,7], sizes:['One size'],
+            img: ph(6,'#d5c3a5','#f5d547'),
+            colorImages: { 9: 'https://via.placeholder.com/500x590/d5c3a5/000?text=Beige', 7: 'https://via.placeholder.com/500x590/f5d547/000?text=Yellow' },
+            badge:'Sale', date:6
+          },
+          { id:7, name:'Mesh Hat', cat:'Hats', price:100, oldPrice:null,
+          priceOptions: [
+              { name: 'Without', price: 100 },
+              { name: 'With Charms', price: 110 }
+            ],
+            colors:[0,1,5,6,7,8,9], sizes:['One size'],
+            img: 'https://ik.imagekit.io/fojb8puzo/DSC0510.jpg',
+            extraImages: [
+              'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%2012.55.03%20AM%20(1).jpeg',
+              'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%2012.55.03%20AM%20(2).jpeg',
+              'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%2012.55.03%20AM%20(3).jpeg',
+              'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%2012.55.02%20AM.jpeg',
+              'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%2012.55.03%20AM.jpeg'
+            ],
+            badge:null, date:7
+          },
+          { id:8, name:'Rolled Phone Strap', cat:'Phone strap', 
+            priceOptions: [
+              { name: 'Hand', price: 70 },
+              { name: 'Cross', price: 110 }
+            ],
+            colors:[1,2,3,4,5,7,8], sizes:['One size'],
+            img: 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%205.11.43%20AM%20(1).jpeg',
+            badge:null, date:8
+          },
+          { id:9, name:'Cross Phone Strap', cat:'Phone strap', price:100, oldPrice:null,
+            colors:[1,2,3,4,5,7,8], sizes:['100 cm','120 cm','140 cm'],
+            img: 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%205.10.15%20AM.jpeg',
+            extraImages: [
+              'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%205.10.15%20AM.jpeg',
+              'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%205.10.15%20AM%20(1).jpeg',
+              'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%205.10.15%20AM%20(1).jpeg'
+            ],
+            badge:'Best Seller', date:9
+          },
+          { id:10, name:'Hand Phone Strap', cat:'Phone strap', price:60, oldPrice:80,
+            colors:[1,2,3,4,5,7,8], sizes:['One size'],
+            img: 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%204.45.54%20AM%20(1).jpeg',
+            badge:'Sale', date:10
+          },
         ];
 
         let state = {
@@ -2311,7 +2359,7 @@
         let cart = [];
         let wishlist = [];
 
-        /* ========== حفظ واستعادة السلة ========== */
+        /* ========== Cart storage ========== */
         function saveCartToStorage() {
             localStorage.setItem('rubies_cart', JSON.stringify(cart));
         }
@@ -2336,7 +2384,7 @@
             }
         }
 
-        /* ========== حفظ واستعادة الـ Wishlist ========== */
+        /* ========== Wishlist storage ========== */
         function saveWishlistToStorage() {
             localStorage.setItem('rubies_wishlist', JSON.stringify(wishlist));
         }
@@ -2385,23 +2433,20 @@
             return p.name || `Bag ${p.id}`;
         }
 
-        /* ========== Skeleton helpers ========== */
+        /* ========== Skeleton ========== */
         function addSkeleton(imgElement) {
             const wrap = imgElement.parentElement;
             if (!wrap) return;
-            // only add if not already present
             if (wrap.querySelector('.skeleton')) return;
             const sk = document.createElement('div');
             sk.className = 'skeleton';
             wrap.appendChild(sk);
-            // when image loads, hide skeleton
             const onLoad = function() {
                 const skEl = wrap.querySelector('.skeleton');
                 if (skEl) skEl.classList.add('hidden');
                 imgElement.removeEventListener('load', onLoad);
             };
             if (imgElement.complete) {
-                // already loaded
                 const skEl = wrap.querySelector('.skeleton');
                 if (skEl) skEl.classList.add('hidden');
             } else {
@@ -2413,7 +2458,6 @@
             if (!container) return;
             const imgs = container.querySelectorAll('img:not(.no-skeleton)');
             imgs.forEach(img => {
-                // if the img already has a skeleton parent, skip
                 const wrap = img.parentElement;
                 if (!wrap) return;
                 if (wrap.classList.contains('product-img-wrap') || wrap.classList.contains('slider-container') ||
@@ -2449,14 +2493,10 @@
             renderWishlistUI();
             renderWishlistDrawer();
             updateWishlistCount();
-            // re-render current product cards to update heart states
             const currentView = state.view;
             if (currentView === 'category') renderProducts();
             renderHomeSections();
-            // also update detail page if open
             if (currentDetailProduct) {
-                const detailId = currentDetailProduct.id;
-                // hearts in detail are not shown, but we update the small cards in "you may like"
                 renderYouMayLike(currentDetailProduct);
             }
         }
@@ -2477,7 +2517,6 @@
         }
 
         function renderWishlistUI() {
-            // This updates hearts on all product cards (called after wishlist changes)
             document.querySelectorAll('.product-card .wishlist-heart, .product-card-small .wishlist-heart').forEach(btn => {
                 const id = parseInt(btn.dataset.id);
                 if (isInWishlist(id)) {
@@ -2486,7 +2525,6 @@
                     btn.classList.remove('active');
                 }
             });
-            // also update search results hearts
             document.querySelectorAll('.search-results .product-card .wishlist-heart').forEach(btn => {
                 const id = parseInt(btn.dataset.id);
                 if (isInWishlist(id)) {
@@ -2637,23 +2675,18 @@
             img.style.transform = `scale(${lightboxZoom}) translate(${clampedPanX}px, ${clampedPanY}px)`;
         }
 
-        // ---- Lightbox event listeners ----
         document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
-
         document.getElementById('lightboxPrev').addEventListener('click', (e) => {
             e.stopPropagation();
             lightboxGoTo(lightboxIndex - 1);
         });
-
         document.getElementById('lightboxNext').addEventListener('click', (e) => {
             e.stopPropagation();
             lightboxGoTo(lightboxIndex + 1);
         });
-
         document.getElementById('lightboxOverlay').addEventListener('click', (e) => {
             if (e.target === e.currentTarget) closeLightbox();
         });
-
         document.addEventListener('keydown', (e) => {
             if (!document.getElementById('lightboxOverlay').classList.contains('show')) return;
             if (e.key === 'Escape') { closeLightbox(); return; }
@@ -2662,15 +2695,11 @@
             if (e.key === 'ArrowRight') { e.preventDefault();
                 lightboxGoTo(lightboxIndex + 1); return; }
         });
-
-        // Desktop: scroll wheel zoom
         document.getElementById('lightboxImgWrap').addEventListener('wheel', (e) => {
             e.preventDefault();
             if (e.deltaY < 0) lightboxZoomIn();
             else lightboxZoomOut();
         }, { passive: false });
-
-        // Desktop: double-click toggle
         document.getElementById('lightboxImgWrap').addEventListener('dblclick', (e) => {
             e.preventDefault();
             if (lightboxZoom > 1) {
@@ -2683,7 +2712,6 @@
             }
         });
 
-        // ---- Touch events for lightbox ----
         const lbWrap = document.getElementById('lightboxImgWrap');
         let lbTouchStartX = 0,
             lbTouchStartY = 0;
@@ -2731,13 +2759,11 @@
                 lbTouchLastY = t.clientY;
 
                 if (lightboxZoom > 1) {
-                    // drag to pan
                     isLightboxDragging = true;
                     lightboxPanX += dx;
                     lightboxPanY += dy;
                     applyLightboxTransform();
                 } else {
-                    // swipe navigation (only if not a drag)
                     const totalDx = t.clientX - lbTouchStartX;
                     const totalDy = t.clientY - lbTouchStartY;
                     if (Math.abs(totalDx) > 20 && Math.abs(totalDx) > Math.abs(totalDy) * 1.2) {
@@ -2822,10 +2848,8 @@
               </div>`;
             }).join('');
 
-            // Add click handlers for product cards
             results.querySelectorAll('.product-card').forEach(card => {
                 card.addEventListener('click', (e) => {
-                    // ignore if click on wishlist heart
                     if (e.target.closest('.wishlist-heart')) return;
                     const id = parseInt(card.dataset.id);
                     const product = PRODUCTS.find(p => p.id === id);
@@ -2836,19 +2860,16 @@
                 });
             });
 
-            // Wishlist hearts in search results
             results.querySelectorAll('.wishlist-heart').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const id = parseInt(btn.dataset.id);
                     toggleWishlist(id);
-                    // update this heart
                     const isActive = isInWishlist(id);
                     btn.classList.toggle('active', isActive);
                 });
             });
 
-            // apply skeletons to search result images
             applySkeletonToContainer(results);
         }
 
@@ -2899,7 +2920,6 @@
                 return;
             }
             section.style.display = 'block';
-            // take up to 4
             const items = sameCat.slice(0, 4);
             row.innerHTML = items.map(p => {
                 const badge = p.badge ? `<span class="badge">${p.badge}</span>` : '';
@@ -2922,7 +2942,6 @@
               </div>`;
             }).join('');
 
-            // Click on card -> open product
             row.querySelectorAll('.product-card-small').forEach(card => {
                 card.addEventListener('click', (e) => {
                     if (e.target.closest('.wishlist-heart')) return;
@@ -2932,7 +2951,6 @@
                 });
             });
 
-            // Wishlist hearts
             row.querySelectorAll('.wishlist-heart').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -2940,17 +2958,13 @@
                     toggleWishlist(id);
                     const isActive = isInWishlist(id);
                     btn.classList.toggle('active', isActive);
-                    // also update all hearts in the same row
                     row.querySelectorAll(`.wishlist-heart[data-id="${id}"]`).forEach(b => {
                         b.classList.toggle('active', isActive);
                     });
                 });
             });
 
-            // Setup scroll arrows for you-may-like
             setupScroll('youMayLikeRow', 'youMayLikeLeft', 'youMayLikeRight');
-
-            // Apply skeletons
             applySkeletonToContainer(row);
         }
 
@@ -3027,7 +3041,6 @@
                 });
             });
 
-            // Apply skeletons
             applySkeletonToContainer(bestRow);
             applySkeletonToContainer(categoryRow);
         }
@@ -3248,8 +3261,18 @@
 
             const colorContainer = document.getElementById('detailColorSwatches');
             colorContainer.innerHTML = product.colors.map(colorIdx => {
+                const color = COLORS[colorIdx];
                 const selectedClass = colorIdx === currentDetailSelectedColor ? 'selected' : '';
-                return `<button class="detail-color-swatch ${selectedClass}" style="background:${COLORS[colorIdx].hex}" data-color="${colorIdx}" title="${COLORS[colorIdx].name}"></button>`;
+                const isSplit = color.split && color.split.length === 2;
+                let style = '';
+                let extraClasses = '';
+                if (isSplit) {
+                    extraClasses = 'split';
+                    style = `--swatch-left: ${color.split[0]}; --swatch-right: ${color.split[1]};`;
+                } else {
+                    style = `background: ${color.hex};`;
+                }
+                return `<button class="detail-color-swatch ${selectedClass} ${extraClasses}" style="${style}" data-color="${colorIdx}" title="${color.name}"></button>`;
             }).join('');
 
             document.getElementById('customizedCheck').classList.remove('checked');
@@ -3309,10 +3332,7 @@
                 }
             };
 
-            // Render "You Might Also Like"
             renderYouMayLike(product);
-
-            // Apply skeleton to slider images
             setTimeout(() => {
                 const track = document.getElementById('sliderTrack');
                 if (track) applySkeletonToContainer(track);
@@ -3344,10 +3364,8 @@
                 });
             });
 
-            // Click on slider image -> open lightbox
             track.querySelectorAll('img').forEach((img, idx) => {
                 img.addEventListener('click', () => {
-                    // Build full image list for lightbox (all slider images)
                     const fullList = sliderImages.map(s => s);
                     openLightbox(fullList, idx);
                 });
@@ -3359,7 +3377,6 @@
             container.addEventListener('touchstart', onSliderTouchStart, { passive: true });
             container.addEventListener('touchend', onSliderTouchEnd, { passive: false });
 
-            // Apply skeletons
             applySkeletonToContainer(track);
         }
 
@@ -3535,7 +3552,6 @@
             window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
         });
 
-        /* ========== Wishlist button in header ========== */
         document.getElementById('wishlistBtn').addEventListener('click', () => {
             if (document.getElementById('wishlistDrawer').classList.contains('show')) {
                 closeWishlistDrawer();
@@ -3571,7 +3587,6 @@
         setupScrollOnce();
         renderCategories();
 
-        // Apply skeletons to all images on load
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 document.querySelectorAll('img:not(.no-skeleton)').forEach(img => {
@@ -3584,9 +3599,7 @@
             }, 100);
         });
 
-        // Re-apply skeletons when new content is rendered via mutations (simple approach)
         const observer = new MutationObserver(() => {
-            // apply to any new images that don't have skeletons yet
             document.querySelectorAll('img:not(.no-skeleton)').forEach(img => {
                 const wrap = img.parentElement;
                 if (!wrap) return;
