@@ -1225,13 +1225,13 @@ let state = {
 };
 let cart = [];
 
-const announceMsgs = ['free delivery on orders over 1,000 EGP','free delivery on orders over 1,000 EGP','free delivery on orders over 1,000 EGP','free delivery on orders over 1,000 EGP'];
+const announceMsgs = ['Free delivery on orders over 1,000 EGP ✨','New arrivals every week 🌸','Handmade with love in Egypt 🤍','Free delivery on orders over 1,000 EGP ✨'];
 document.getElementById('announceTrack').innerHTML = [...announceMsgs, ...announceMsgs].map(m => `<span>${m}</span>`).join('');
 
 // ========== تهيئة الأقسام الرئيسية ==========
 function renderHomeSections() {
-  // Best Sellers
-  const bestSellers = PRODUCTS.filter(p => p.badge === 'Best Seller' && !p.soldOut);
+  // Best Sellers - عرض أول 6 منتجات متاحة
+  const bestSellers = PRODUCTS.filter(p => !p.soldOut).slice(0, 6);
   const bestRow = document.getElementById('bestSellerRow');
   bestRow.innerHTML = bestSellers.map(p => {
     const badge = p.badge ? `<span class="badge">${p.badge}</span>` : '';
@@ -1275,10 +1275,15 @@ function renderHomeSections() {
       showCategoryProducts(cat);
     });
   });
+}
 
-  // Scroll arrows functionality
+// تفعيل السهم مرة واحدة فقط
+let arrowsInitialized = false;
+function setupScrollOnce() {
+  if (arrowsInitialized) return;
   setupScroll('bestSellerRow', 'bestSellerLeft', 'bestSellerRight');
   setupScroll('categoryRow', 'categoryLeft', 'categoryRight');
+  arrowsInitialized = true;
 }
 
 function getCategoryColor(cat) {
@@ -1298,11 +1303,21 @@ function setupScroll(rowId, leftBtnId, rightBtnId) {
 // ========== التنقل إلى صفحة القسم ==========
 function showCategoryProducts(cat) {
   state.category = cat;
+  state.maxPrice = 700; // إعادة تعيين السعر
+  state.stock = 'all'; // إعادة تعيين التوفر
   state.view = 'category';
+  
   document.getElementById('homeSections').style.display = 'none';
   document.getElementById('categoryProductsPage').classList.add('show');
   document.getElementById('pageTitle').textContent = cat;
   document.getElementById('breadcrumbCat').textContent = cat;
+  
+  // إعادة ضبط الفلاتر في الـ sidebar
+  document.getElementById('priceRange').value = 700;
+  document.getElementById('priceMax').textContent = '700 EGP';
+  document.querySelectorAll('.filter-toggle').forEach(b => b.classList.remove('active'));
+  document.querySelector('[data-stock="all"]').classList.add('active');
+  
   renderCategories();
   renderProducts();
 }
@@ -1313,6 +1328,7 @@ function goHome() {
   state.category = '';
   document.getElementById('homeSections').style.display = 'block';
   document.getElementById('categoryProductsPage').classList.remove('show');
+  document.getElementById('productDetailPage').classList.remove('show');
   document.getElementById('trustStrip').style.display = 'block';
   window.scrollTo(0,0);
 }
@@ -1481,8 +1497,6 @@ document.getElementById('backToShopBtn').addEventListener('click', () => {
 
 document.getElementById('logoHome').addEventListener('click', (e) => {
   e.preventDefault();
-  document.getElementById('productDetailPage').classList.remove('show');
-  document.getElementById('shopPage').style.display = 'block';
   goHome();
 });
 
@@ -1574,6 +1588,7 @@ document.getElementById('mobileFilterOpen').addEventListener('click', openMobile
 
 // ========== البداية ==========
 renderHomeSections();
+setupScrollOnce();
 renderCategories();
 renderCart();
 </script>
