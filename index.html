@@ -109,7 +109,7 @@
   .logo{
     display:flex;
     align-items:center;
-    height:45px;
+    height:55px;
     flex-shrink:0;
   }
   .logo-img{
@@ -146,7 +146,6 @@
 
   .mobile-toggle{display:none;}
 
-  /* ===== الصفحة الرئيسية ===== */
   .home-section{
     max-width:1280px;
     margin:0 auto 48px;
@@ -284,7 +283,6 @@
     font-size:0.9rem;
   }
 
-  /* ===== صفحة المنتجات حسب القسم ===== */
   #categoryProductsPage{
     display:none;
   }
@@ -512,7 +510,6 @@
     font-size:0.85rem;
   }
 
-  /* ===== صفحة تفاصيل المنتج ===== */
   #productDetailPage{
     display:none;
     max-width:1280px;
@@ -550,13 +547,12 @@
     position:relative;
     overflow:hidden;
   }
-  /* ===== معرض الصور (slider) ===== */
   .slider-container{
     width:100%;
     position:relative;
     overflow:hidden;
     border-radius:18px;
-    touch-action:pan-y; /* اسمح بالتمرير العمودي فقط بشكل افتراضي */
+    touch-action:pan-y;
   }
   .slider-track{
     display:flex;
@@ -660,7 +656,6 @@
   }
   .detail-add-to-cart:hover{background:var(--ruby-deep);}
 
-  /* ===== خيار Customized in Notes ===== */
   .customized-option{
     display:flex;
     align-items:center;
@@ -981,7 +976,7 @@
   @media (max-width:560px){
     .product-grid{gap:22px 14px;}
     .header-inner{padding:14px 18px;}
-    .logo{height:36px;}
+    .logo{height:42px;}
     .page-head{padding:36px 18px 18px;}
   }
 
@@ -1020,7 +1015,6 @@
   </div>
 </header>
 
-<!-- صفحة المتجر الرئيسية -->
 <div id="shopPage">
   <div id="homeSections">
     <div class="home-section">
@@ -1041,7 +1035,6 @@
     </div>
   </div>
 
-  <!-- صفحة عرض منتجات قسم معين -->
   <div id="categoryProductsPage">
     <div class="page-head">
       <div class="breadcrumb">
@@ -1093,7 +1086,6 @@
   </div>
 </div>
 
-<!-- صفحة تفاصيل المنتج -->
 <div id="productDetailPage">
   <div class="back-btn" id="backToShopBtn">← Back</div>
   <div class="product-detail-layout">
@@ -1115,7 +1107,6 @@
         <div class="detail-size-label">Select Color</div>
         <div class="detail-colors" id="detailColorSwatches"></div>
       </div>
-      <!-- خيار التخصيص -->
       <div class="customized-option" id="customizedOption">
         <div class="customized-check" id="customizedCheck"></div>
         <span>Customized in Notes</span>
@@ -1196,15 +1187,8 @@
 </div>
 
 <script>
-/* ============ إعدادات سهلة التعديل ============ */
-
-// الفئات
 const CATEGORIES = ['Shoulder bag', 'Cross bag', 'Clutch', 'Hats', 'Phone strap'];
-
-// معرفات المنتجات التي ستظهر في Best Sellers (يمكنك تغيير الأرقام هنا)
 const BEST_SELLER_IDS = [9, 1];
-
-// صور الفئات (ضع رابط الصورة المناسب لكل فئة)
 const CATEGORY_IMAGES = {
   'Shoulder bag': 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2027,%202026,%2010_54_42%20PM.png',
   'Cross bag': '',
@@ -1331,9 +1315,7 @@ let cart = [];
 const announceMsgs = ['Free delivery on orders over 1,000 EGP ✨','New arrivals every week 🌸','Free delivery on orders over 1,000 EGP ✨','New arrivals every week 🌸'];
 document.getElementById('announceTrack').innerHTML = [...announceMsgs, ...announceMsgs].map(m => `<span>${m}</span>`).join('');
 
-// ========== تهيئة الأقسام الرئيسية ==========
 function renderHomeSections() {
-  // Best Sellers - يستخدم BEST_SELLER_IDS
   const bestSellers = BEST_SELLER_IDS.map(id => PRODUCTS.find(p => p.id === id)).filter(p => p && !p.soldOut);
   const bestRow = document.getElementById('bestSellerRow');
   bestRow.innerHTML = bestSellers.map(p => {
@@ -1361,7 +1343,6 @@ function renderHomeSections() {
     });
   });
 
-  // Categories - يستخدم CATEGORY_IMAGES
   const categoryRow = document.getElementById('categoryRow');
   categoryRow.innerHTML = CATEGORIES.map(cat => {
     const imgSrc = CATEGORY_IMAGES[cat] || `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="300" height="375"><rect width="300" height="375" fill="${getCategoryColor(cat)}"/><text x="150" y="190" font-family="Georgia" font-size="20" fill="#8B3A42" text-anchor="middle">${cat}</text></svg>`)}`;
@@ -1402,7 +1383,6 @@ function setupScroll(rowId, leftBtnId, rightBtnId) {
   rightBtn.addEventListener('click', () => row.scrollBy({ left: 250, behavior: 'smooth' }));
 }
 
-// ========== التنقل إلى صفحة القسم ==========
 function showCategoryProducts(cat) {
   state.category = cat;
   state.maxPrice = 700;
@@ -1423,18 +1403,17 @@ function showCategoryProducts(cat) {
   renderProducts();
 }
 
-// ========== العودة إلى الصفحة الرئيسية ==========
 function goHome() {
   state.view = 'home';
   state.category = '';
   document.getElementById('homeSections').style.display = 'block';
   document.getElementById('categoryProductsPage').classList.remove('show');
   document.getElementById('productDetailPage').classList.remove('show');
+  document.getElementById('shopPage').style.display = 'block';
   document.getElementById('trustStrip').style.display = 'block';
   window.scrollTo(0,0);
 }
 
-// ========== الفلاتر والسلة وباقي الوظائف ==========
 function renderCategories(){
   const list = document.getElementById('categoryList');
   const all = ['All', ...CATEGORIES];
@@ -1533,7 +1512,6 @@ function renderProducts(){
   });
 }
 
-// ========== تفاصيل المنتج ==========
 let currentDetailProduct = null;
 let currentDetailSelectedColor = 0;
 let isCustomized = false;
@@ -1630,7 +1608,6 @@ function renderSlider(){
     });
   });
 
-  // استخدام approach جديد: لمسة واحدة تحسب الفرق وتحرك
   const container = document.getElementById('sliderContainer');
   container.removeEventListener('touchstart', onSliderTouchStart);
   container.removeEventListener('touchend', onSliderTouchEnd);
@@ -1645,7 +1622,7 @@ function onSliderTouchStart(e) {
 function onSliderTouchEnd(e) {
   const diff = sliderTouchStartX - e.changedTouches[0].screenX;
   if (Math.abs(diff) > 40) {
-    e.preventDefault(); // نمنع السلوك الافتراضي فقط إذا كان هناك سحب أفقي واضح
+    e.preventDefault();
     if (diff > 0 && currentSlide < sliderImages.length - 1) {
       currentSlide++;
     } else if (diff < 0 && currentSlide > 0) {
@@ -1695,7 +1672,6 @@ document.getElementById('detailAddToCartBtn').addEventListener('click', () => {
   addToCart(product.id, size, colorName, imgSrc, customizationNotes);
 });
 
-// ========== السلة ==========
 function addToCart(productId, size, color, imageSrc, notes = ''){
   const product = PRODUCTS.find(p => p.id === productId);
   if(!product || product.soldOut) return;
@@ -1776,7 +1752,6 @@ function openMobileFilter(){ document.getElementById('sidebar').classList.add('s
 function closeMobileFilter(){ document.getElementById('sidebar').classList.remove('show'); if(!document.getElementById('cartDrawer').classList.contains('show')) document.getElementById('overlay').classList.remove('show'); }
 document.getElementById('mobileFilterOpen').addEventListener('click', openMobileFilter);
 
-// ========== البداية ==========
 renderHomeSections();
 setupScrollOnce();
 renderCategories();
