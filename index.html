@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="color-scheme" content="light only">
+<title>Rubies</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blush:#FBF1F0;
+    --blush-deep:#F5DCE0;
+    --rose:#E8A0A8;
+    --rose-soft:#EFC0C6;
+    --ruby:#8B3A42;
+    --ruby-deep:#6E2A30;
+    --ink:#3D2B2E;
+    --gold:#C9A876;
+    --cream:#FFFDFB;
+    --line:rgba(61,43,46,0.12);
+    --shadow:0 10px 30px -12px rgba(139,58,66,0.18);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{
+    scroll-behavior:smooth;
+    color-scheme:light;
+    touch-action:pan-x pan-y;
+  }
+
+  body{
+    background:var(--blush);
+    color:var(--ink);
+    font-family:'Jost',sans-serif;
+    font-weight:400;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    color-scheme:light;
+    touch-action:pan-x pan-y;
+  }
+
+  h1,h2,h3,.serif{
+    font-family:'Cormorant Garamond',serif;
+  }
+
+  a{text-decoration:none;color:inherit;}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;}
+  ul{list-style:none;}
+  img{max-width:100%;display:block;}
+
+  input,select,textarea,button{
+    color-scheme:light;
+    font-size:16px;
+  }
+
+  .stitch{
+    height:10px;
+    width:100%;
+    background-image:repeating-linear-gradient(
+      to right,
+      var(--ruby) 0px, var(--ruby) 8px,
+      transparent 8px, transparent 16px
+    );
+    opacity:0.45;
+  }
+
+  .announce{
+    background:var(--ruby);
+    color:var(--cream);
+    font-size:0.78rem;
+    letter-spacing:0.06em;
+    padding:9px 0;
+    overflow:hidden;
+    position:relative;
+  }
+  .announce-track{
+    display:flex;
+    white-space:nowrap;
+    animation:scrollbar 20s linear infinite;
+    gap:48px;
+  }
+  .announce-track span{display:flex;align-items:center;gap:10px;font-weight:500;}
+  .announce-track span::after{content:"•"; color:var(--gold); margin-left:10px;}
+  @keyframes scrollbar{
+    0%{transform:translateX(0);}
+    100%{transform:translateX(-50%);}
+  }
+
+  header{
+    background:var(--cream);
+    position:sticky;
+    top:0;
+    z-index:100;
+    border-bottom:1px solid var(--line);
+  }
+  .header-inner{
+    max-width:1280px;
+    margin:0 auto;
+    padding:18px 28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+  }
+
+  .logo{
+    display:flex;
+    align-items:center;
+    height:45px;
+    flex-shrink:0;
+  }
+  .logo-img{
+    height:100%;
+    width:auto;
+    display:block;
+  }
+
+  .header-icons{
+    display:flex;
+    align-items:center;
+    gap:20px;
+  }
+  .icon-btn{
+    position:relative;
+    width:38px;height:38px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:50%;
+    transition:background .2s;
+  }
+  .icon-btn:hover{background:var(--blush-deep);}
+  .icon-btn svg{width:19px;height:19px;stroke:var(--ink);}
+  .cart-count{
+    position:absolute;
+    top:-2px; right:-2px;
+    background:var(--ruby);
+    color:#fff;
+    font-size:0.65rem;
+    width:17px;height:17px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Jost',sans-serif;
+  }
+
+  .mobile-toggle{display:none;}
+
+  /* ===== الصفحة الرئيسية ===== */
+  .home-section{
+    max-width:1280px;
+    margin:0 auto 48px;
+    padding:0 28px;
+  }
+  .home-section:first-of-type{
+    margin-top:30px;
+  }
+  .section-title{
+    font-size:2rem;
+    font-weight:500;
+    font-style:italic;
+    color:var(--ruby-deep);
+    margin-bottom:18px;
+  }
+  .horizontal-scroll{
+    position:relative;
+    display:flex;
+    align-items:center;
+  }
+  .scroll-row{
+    display:flex;
+    overflow-x:auto;
+    scroll-behavior:smooth;
+    scroll-snap-type:x mandatory;
+    gap:16px;
+    padding-bottom:10px;
+    flex:1;
+  }
+  .scroll-row::-webkit-scrollbar{display:none;}
+  .scroll-arrow{
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    z-index:2;
+    width:36px;height:36px;
+    border-radius:50%;
+    background:var(--cream);
+    box-shadow:0 4px 12px rgba(0,0,0,0.12);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    border:none;
+    opacity:0.85;
+    transition:opacity 0.2s;
+    flex-shrink:0;
+  }
+  .scroll-arrow:hover{opacity:1;}
+  .scroll-arrow.left{left:-8px;}
+  .scroll-arrow.right{right:-8px;}
+  .scroll-arrow svg{width:16px;height:16px;stroke:var(--ruby-deep);}
+
+  .product-card-small{
+    flex:0 0 220px;
+    scroll-snap-align:start;
+    cursor:pointer;
+    position:relative;
+  }
+  .product-card-small .product-img-wrap{
+    aspect-ratio:1/1.18;
+    border-radius:16px;
+    overflow:hidden;
+    background:var(--blush-deep);
+    margin-bottom:10px;
+  }
+  .product-card-small .product-img-wrap img{
+    width:100%;height:100%;
+    object-fit:cover;
+    transition:transform .4s;
+  }
+  .product-card-small:hover .product-img-wrap img{transform:scale(1.04);}
+  .product-card-small .badge{
+    position:absolute;
+    top:8px;left:8px;
+    background:var(--ruby);
+    color:#fff;
+    font-size:0.65rem;
+    letter-spacing:0.04em;
+    padding:4px 10px;
+    border-radius:16px;
+  }
+  .product-card-small .product-info{
+    padding:0 2px;
+  }
+  .product-card-small .product-cat{
+    font-size:0.7rem;
+    text-transform:uppercase;
+    color:var(--rose);
+    margin-bottom:3px;
+  }
+  .product-card-small .product-title{
+    font-size:0.95rem;
+    font-weight:500;
+    color:var(--ink);
+    margin-bottom:4px;
+  }
+  .product-card-small .product-price{
+    font-size:0.85rem;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .product-card-small .price-now{color:var(--ruby-deep);font-weight:500;}
+  .product-card-small .price-old{
+    text-decoration:line-through;
+    opacity:0.5;
+    font-size:0.75rem;
+  }
+
+  .category-card{
+    flex:0 0 170px;
+    scroll-snap-align:start;
+    border-radius:18px;
+    overflow:hidden;
+    background:var(--blush-deep);
+    aspect-ratio:1/1.25;
+    cursor:pointer;
+    position:relative;
+  }
+  .category-card img{
+    width:100%;height:100%;
+    object-fit:cover;
+    transition:transform .4s;
+  }
+  .category-card:hover img{transform:scale(1.05);}
+  .category-card .cat-name{
+    position:absolute;
+    bottom:0;left:0;right:0;
+    background:rgba(61,43,46,0.7);
+    color:#fff;
+    padding:10px 8px;
+    text-align:center;
+    font-weight:500;
+    font-size:0.9rem;
+  }
+
+  /* ===== صفحة المنتجات حسب القسم ===== */
+  #categoryProductsPage{
+    display:none;
+  }
+  #categoryProductsPage.show{
+    display:block;
+  }
+
+  .page-head{
+    max-width:1280px;
+    margin:0 auto;
+    padding:52px 28px 28px;
+    text-align:center;
+  }
+  .breadcrumb{
+    font-size:0.82rem;
+    color:var(--ink);
+    opacity:0.55;
+    margin-bottom:14px;
+    letter-spacing:.02em;
+  }
+  .breadcrumb a:hover{color:var(--ruby); opacity:1;}
+  .page-head h1{
+    font-size:3rem;
+    font-weight:500;
+    color:var(--ruby-deep);
+    font-style:italic;
+  }
+  .page-head .sub{
+    margin-top:10px;
+    font-size:0.95rem;
+    color:var(--ink);
+    opacity:0.65;
+    max-width:520px;
+    margin-inline:auto;
+  }
+  .head-stitch{
+    width:120px;
+    margin:22px auto 0;
+  }
+
+  .no-refund-banner{
+    max-width:1280px;
+    margin:0 auto 32px;
+    padding:0 28px;
+  }
+  .no-refund-banner .inner{
+    background:var(--blush-deep);
+    border:1px solid var(--rose-soft);
+    border-radius:14px;
+    padding:13px 20px;
+    text-align:center;
+    font-size:0.85rem;
+    letter-spacing:0.02em;
+    color:var(--ruby-deep);
+  }
+
+  .shop-wrap{
+    max-width:1280px;
+    margin:0 auto;
+    padding:10px 28px 100px;
+    display:grid;
+    grid-template-columns:260px 1fr;
+    gap:44px;
+  }
+
+  .sidebar{
+    align-self:start;
+  }
+  .filter-block{
+    margin-bottom:34px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:26px;
+  }
+  .filter-block:last-child{border-bottom:none;}
+  .filter-block h3{
+    font-size:1.05rem;
+    font-style:italic;
+    font-weight:500;
+    margin-bottom:16px;
+    color:var(--ruby-deep);
+  }
+  .filter-list li{
+    margin-bottom:10px;
+  }
+  .filter-list button{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    width:100%;
+    font-size:0.9rem;
+    color:var(--ink);
+    opacity:0.75;
+    padding:5px 0;
+    transition:all .2s;
+  }
+  .filter-list button:hover{opacity:1; color:var(--ruby);}
+  .filter-list button.active{
+    opacity:1;
+    color:var(--ruby);
+    font-weight:500;
+  }
+  .filter-list .count{
+    font-size:0.78rem;
+    opacity:0.55;
+    background:var(--blush-deep);
+    padding:1px 8px;
+    border-radius:20px;
+  }
+
+  .price-range{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .price-range input[type="range"]{
+    width:100%;
+    accent-color:var(--ruby);
+  }
+  .price-range .vals{
+    display:flex;
+    justify-content:space-between;
+    font-size:0.82rem;
+    opacity:0.7;
+  }
+
+  .toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:28px;
+    flex-wrap:wrap;
+    gap:14px;
+  }
+  .result-count{
+    font-size:0.88rem;
+    opacity:0.65;
+  }
+  .sort-select{
+    position:relative;
+  }
+  .sort-select select{
+    font-family:'Jost',sans-serif;
+    font-size:0.88rem;
+    padding:9px 16px 9px 36px;
+    border:1px solid var(--line);
+    border-radius:30px;
+    background:var(--cream);
+    color:var(--ink);
+    appearance:none;
+    cursor:pointer;
+  }
+  .sort-select::after{
+    content:'';
+    position:absolute;
+    right:14px; top:50%;
+    width:7px;height:7px;
+    border-right:1.5px solid var(--ink);
+    border-bottom:1.5px solid var(--ink);
+    transform:translateY(-65%) rotate(45deg);
+    pointer-events:none;
+  }
+
+  .product-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:36px 28px;
+  }
+
+  .product-card{
+    position:relative;
+    cursor:pointer;
+  }
+  .product-img-wrap{
+    position:relative;
+    aspect-ratio:1/1.18;
+    border-radius:18px;
+    overflow:hidden;
+    background:var(--blush-deep);
+    margin-bottom:16px;
+  }
+  .product-img-wrap img{
+    width:100%;height:100%;
+    object-fit:cover;
+    transition:transform .55s cubic-bezier(.2,.8,.2,1);
+  }
+  .product-card:hover .product-img-wrap img{transform:scale(1.06);}
+
+  .badge{
+    position:absolute;
+    top:12px; left:12px;
+    background:var(--ruby);
+    color:#fff;
+    font-size:0.7rem;
+    letter-spacing:0.04em;
+    padding:5px 11px;
+    border-radius:20px;
+    z-index:2;
+  }
+  .badge.sold-out{background:var(--ink); opacity:0.7;}
+
+  .product-info{padding:0 4px;}
+  .product-cat{
+    font-size:0.72rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--rose);
+    margin-bottom:5px;
+  }
+  .product-title{
+    font-size:1.08rem;
+    font-weight:500;
+    color:var(--ink);
+    margin-bottom:6px;
+  }
+  .product-price{
+    font-size:0.95rem;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .price-now{color:var(--ruby-deep); font-weight:500;}
+  .price-old{
+    text-decoration:line-through;
+    opacity:0.45;
+    font-size:0.85rem;
+  }
+
+  /* ===== صفحة تفاصيل المنتج ===== */
+  #productDetailPage{
+    display:none;
+    max-width:1280px;
+    margin:0 auto;
+    padding:30px 28px 80px;
+  }
+  #productDetailPage.show{
+    display:block;
+  }
+  .back-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:0.9rem;
+    margin-bottom:24px;
+    color:var(--ruby-deep);
+    cursor:pointer;
+    transition:opacity 0.2s;
+  }
+  .back-btn:hover{opacity:0.7;}
+  .product-detail-layout{
+    display:flex;
+    flex-wrap:wrap;
+    gap:40px;
+  }
+  .detail-img-col{
+    flex:1 1 400px;
+    background:var(--blush-deep);
+    border-radius:28px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+  .detail-img-col img{
+    width:100%;
+    max-height:600px;
+    object-fit:cover;
+    border-radius:18px;
+  }
+  .detail-info-col{
+    flex:1 1 300px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+  .detail-info-col h2{
+    font-size:2.2rem;
+    font-style:italic;
+    color:var(--ruby-deep);
+  }
+  .detail-cat{
+    font-size:0.8rem;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--rose);
+  }
+  .detail-price{
+    font-size:1.4rem;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .detail-price .current{color:var(--ruby-deep); font-weight:500;}
+  .detail-price .old{text-decoration:line-through; opacity:0.5; font-size:1rem;}
+  .detail-colors{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .detail-color-swatch{
+    width:36px; height:36px;
+    border-radius:50%;
+    border:3px solid transparent;
+    cursor:pointer;
+    transition:transform 0.15s, border-color 0.15s;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,0.1);
+  }
+  .detail-color-swatch.selected{
+    border-color:var(--ruby);
+    transform:scale(1.15);
+  }
+  .detail-size-label{
+    font-weight:500;
+    margin-bottom:6px;
+  }
+  .detail-size-select{
+    font-family:'Jost',sans-serif;
+    padding:10px 14px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:var(--cream);
+    color:var(--ink);
+    cursor:pointer;
+    font-size:0.95rem;
+    width:100%;
+    max-width:250px;
+  }
+  .detail-add-to-cart{
+    background:var(--ruby);
+    color:#fff;
+    padding:14px 24px;
+    border-radius:30px;
+    font-size:1rem;
+    letter-spacing:0.02em;
+    transition:background .2s;
+    margin-top:10px;
+    border:none;
+    cursor:pointer;
+    max-width:250px;
+    text-align:center;
+  }
+  .detail-add-to-cart:hover{background:var(--ruby-deep);}
+
+  .empty-state{
+    grid-column:1/-1;
+    text-align:center;
+    padding:70px 20px;
+  }
+  .empty-state .ico{
+    font-size:2.4rem;
+    color:var(--rose-soft);
+    margin-bottom:14px;
+  }
+  .empty-state h3{
+    font-style:italic;
+    font-size:1.4rem;
+    color:var(--ruby-deep);
+    margin-bottom:8px;
+  }
+  .empty-state p{opacity:0.6; font-size:0.92rem;}
+
+  .trust-strip{
+    background:var(--cream);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    margin-top:40px;
+  }
+  .trust-inner{
+    max-width:1280px;
+    margin:0 auto;
+    padding:36px 28px;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:24px;
+  }
+  .trust-item{
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .trust-item .ic{
+    width:42px;height:42px;
+    border-radius:50%;
+    background:var(--blush-deep);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .trust-item .ic svg{width:20px;height:20px;stroke:var(--ruby-deep);}
+  .trust-item h4{font-size:0.92rem;font-weight:500;margin-bottom:2px;}
+  .trust-item p{font-size:0.78rem;opacity:0.6;}
+
+  footer{
+    background:var(--ruby-deep);
+    color:var(--blush);
+    padding:60px 28px 30px;
+  }
+  .footer-inner{
+    max-width:1280px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:1.4fr 1fr;
+    gap:40px;
+  }
+  .footer-inner h4{
+    font-size:1rem;
+    font-style:italic;
+    margin-bottom:18px;
+    color:var(--gold);
+  }
+  .footer-inner ul li{margin-bottom:10px;}
+  .footer-inner ul li a{
+    font-size:0.88rem;
+    opacity:0.8;
+    transition:opacity .2s;
+  }
+  .footer-inner ul li a:hover{opacity:1; color:var(--gold);}
+  .footer-logo{
+    font-family:'Cormorant Garamond',serif;
+    font-size:1.7rem;
+    color:var(--cream);
+    margin-bottom:14px;
+  }
+  .footer-inner p.desc{font-size:0.85rem; opacity:0.75; line-height:1.7; margin-bottom:18px;}
+  .footer-inner p.no-refund{font-size:0.78rem; opacity:0.85; line-height:1.6; color:var(--gold); border:1px solid rgba(201,168,118,0.4); border-radius:10px; padding:10px 14px; display:inline-block;}
+  .social-row{display:flex; gap:12px;}
+  .social-row a{
+    width:36px;height:36px;
+    border-radius:50%;
+    border:1px solid rgba(251,241,240,0.3);
+    display:flex;align-items:center;justify-content:center;
+    transition:background .2s;
+  }
+  .social-row a:hover{background:rgba(251,241,240,0.15);}
+  .social-row svg{width:16px;height:16px;stroke:var(--blush);}
+  .footer-bottom{
+    max-width:1280px;
+    margin:40px auto 0;
+    padding-top:24px;
+    border-top:1px solid rgba(251,241,240,0.15);
+    text-align:center;
+    font-size:0.78rem;
+    opacity:0.6;
+  }
+
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(61,43,46,0.4);
+    opacity:0; pointer-events:none;
+    transition:opacity .3s;
+    z-index:200;
+  }
+  .overlay.show{opacity:1; pointer-events:auto;}
+
+  .cart-drawer{
+    position:fixed;
+    top:0; right:0;
+    width:400px;
+    max-width:92vw;
+    height:100vh;
+    background:var(--cream);
+    z-index:201;
+    transform:translateX(100%);
+    transition:transform .35s cubic-bezier(.2,.8,.2,1);
+    display:flex;
+    flex-direction:column;
+  }
+  .cart-drawer.show{transform:translateX(0);}
+  .cart-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:22px 24px;
+    border-bottom:1px solid var(--line);
+  }
+  .cart-head h3{font-style:italic; font-size:1.3rem; color:var(--ruby-deep);}
+  .close-btn{
+    width:32px;height:32px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .2s;
+  }
+  .close-btn:hover{background:var(--blush-deep);}
+  .cart-items{
+    flex:1;
+    overflow-y:auto;
+    padding:20px 24px;
+  }
+  .cart-item{
+    display:flex;
+    gap:14px;
+    padding:14px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .cart-item img{
+    width:68px;height:68px;
+    border-radius:12px;
+    object-fit:cover;
+    background:var(--blush-deep);
+  }
+  .cart-item-info{flex:1;}
+  .cart-item-info h5{font-size:0.92rem; font-weight:500; margin-bottom:4px;}
+  .cart-item-info .qty-row{
+    display:flex;align-items:center;gap:10px;
+    margin-top:8px;
+  }
+  .cart-item-info .variant{
+    font-size:0.78rem;
+    opacity:0.7;
+    margin-top:4px;
+  }
+  .qty-btn{
+    width:22px;height:22px;
+    border:1px solid var(--line);
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:0.8rem;
+  }
+  .qty-btn:hover{background:var(--blush-deep);}
+  .cart-empty{
+    text-align:center;
+    padding:60px 10px;
+    opacity:0.55;
+  }
+  .cart-foot{
+    padding:20px 24px 26px;
+    border-top:1px solid var(--line);
+  }
+  .customer-fields{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .cart-input{
+    font-family:'Jost',sans-serif;
+    font-size:0.88rem;
+    padding:11px 14px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:var(--blush);
+    color:var(--ink);
+    width:100%;
+  }
+  .cart-input::placeholder{color:var(--ink); opacity:0.5;}
+  .cart-input:focus{outline:1.5px solid var(--rose); background:var(--cream);}
+  .cart-textarea{
+    resize:vertical;
+    min-height:64px;
+    font-family:'Jost',sans-serif;
+  }
+  .cart-subtotal{
+    display:flex;
+    justify-content:space-between;
+    font-size:1rem;
+    margin-bottom:16px;
+  }
+  .cart-subtotal .amt{color:var(--ruby-deep); font-weight:500;}
+  .checkout-btn{
+    width:100%;
+    background:var(--ruby);
+    color:#fff;
+    padding:14px 0;
+    border-radius:30px;
+    font-size:0.95rem;
+    letter-spacing:0.02em;
+    transition:background .2s;
+  }
+  .checkout-btn:hover{background:var(--ruby-deep);}
+  .secure-note{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    font-size:0.74rem;
+    opacity:0.6;
+    margin-top:12px;
+    text-align:center;
+  }
+  .secure-note svg{width:13px;height:13px;flex-shrink:0;}
+  .no-refund-note{
+    font-size:0.72rem;
+    opacity:0.7;
+    text-align:center;
+    margin-top:8px;
+    color:var(--ruby);
+  }
+
+  .mobile-filter-toggle{display:none;}
+
+  @media (max-width:980px){
+    .header-icons{gap:12px;}
+    .mobile-toggle{
+      display:flex;width:38px;height:38px;align-items:center;justify-content:center;
+    }
+    .shop-wrap{grid-template-columns:1fr;}
+    .sidebar{
+      position:fixed;
+      top:0; left:-100%;
+      width:300px;
+      max-width:85vw;
+      height:100vh;
+      background:var(--cream);
+      z-index:300;
+      padding:24px;
+      overflow-y:auto;
+      transition:left .35s ease;
+      box-shadow:10px 0 30px rgba(0,0,0,0.1);
+    }
+    .sidebar.show{left:0;}
+    .product-grid{grid-template-columns:repeat(2,1fr);}
+    .page-head h1{font-size:2.2rem;}
+    .trust-inner{grid-template-columns:repeat(2,1fr);}
+    .footer-inner{grid-template-columns:1fr;}
+    .product-detail-layout{flex-direction:column;}
+    .product-card-small{flex:0 0 180px;}
+    .category-card{flex:0 0 150px;}
+  }
+
+  @media (max-width:560px){
+    .product-grid{gap:22px 14px;}
+    .header-inner{padding:14px 18px;}
+    .logo{height:36px;}
+    .page-head{padding:36px 18px 18px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+  }
+
+  a:focus-visible, button:focus-visible, select:focus-visible{
+    outline:2px solid var(--ruby);
+    outline-offset:2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="announce">
+  <div class="announce-track" id="announceTrack"></div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <button class="mobile-toggle" id="mobileFilterOpen" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+
+    <a href="#" class="logo" id="logoHome">
+      <img src="https://ik.imagekit.io/fojb8puzo/Rubies%20Logo%201.png" alt="Rubies" class="logo-img">
+    </a>
+
+    <div class="header-icons">
+      <button class="icon-btn" id="cartBtn" aria-label="Cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M6 7h14l-1.5 9.5a2 2 0 01-2 1.5H8.7a2 2 0 01-2-1.6L4.5 4H2"/><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/></svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- صفحة المتجر الرئيسية -->
+<div id="shopPage">
+  <!-- أقسام الصفحة الرئيسية الجديدة -->
+  <div id="homeSections">
+    <div class="home-section">
+      <h2 class="section-title">Best Sellers</h2>
+      <div class="horizontal-scroll" id="bestSellerScroll">
+        <button class="scroll-arrow left" id="bestSellerLeft"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <div class="scroll-row" id="bestSellerRow"></div>
+        <button class="scroll-arrow right" id="bestSellerRight"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+    </div>
+    <div class="home-section">
+      <h2 class="section-title">Categories</h2>
+      <div class="horizontal-scroll" id="categoryScroll">
+        <button class="scroll-arrow left" id="categoryLeft"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <div class="scroll-row" id="categoryRow"></div>
+        <button class="scroll-arrow right" id="categoryRight"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- صفحة عرض منتجات قسم معين -->
+  <div id="categoryProductsPage">
+    <div class="page-head">
+      <div class="breadcrumb">
+        <a href="#" id="homeBreadcrumb">Home</a> &nbsp;/&nbsp; <span id="breadcrumbCat">Shop</span>
+      </div>
+      <h1 id="pageTitle">Shop</h1>
+      <p class="sub">Every piece is handmade with care — real craftsmanship, real materials, and a touch that's only Rubies.</p>
+      <div class="head-stitch stitch"></div>
+    </div>
+    <div class="no-refund-banner">
+      <div class="inner">All sales are final — no refunds. Exchanges may be available, please contact us via WhatsApp before ordering if you have questions.</div>
+    </div>
+    <div class="shop-wrap">
+      <aside class="sidebar" id="sidebar">
+        <div class="filter-block">
+          <h3>Category</h3>
+          <ul class="filter-list" id="categoryList"></ul>
+        </div>
+        <div class="filter-block">
+          <h3>Price</h3>
+          <div class="price-range">
+            <input type="range" id="priceRange" min="50" max="700" value="700" step="10">
+            <div class="vals"><span>50 EGP</span><span id="priceMax">700 EGP</span></div>
+          </div>
+        </div>
+        <div class="filter-block">
+          <h3>Availability</h3>
+          <ul class="filter-list">
+            <li><button class="filter-toggle active" data-stock="all">All <span class="count" id="cntAll"></span></button></li>
+            <li><button class="filter-toggle" data-stock="in">In stock <span class="count" id="cntIn"></span></button></li>
+          </ul>
+        </div>
+      </aside>
+      <main>
+        <div class="toolbar">
+          <div class="result-count" id="resultCount"></div>
+          <div class="sort-select">
+            <select id="sortSelect">
+              <option value="featured">Featured</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="new">Newest</option>
+            </select>
+          </div>
+        </div>
+        <div class="product-grid" id="productGrid"></div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- صفحة تفاصيل المنتج -->
+<div id="productDetailPage">
+  <div class="back-btn" id="backToShopBtn">← Back</div>
+  <div class="product-detail-layout">
+    <div class="detail-img-col">
+      <img id="detailImg" src="" alt="Product Image">
+    </div>
+    <div class="detail-info-col">
+      <div class="detail-cat" id="detailCat"></div>
+      <h2 id="detailName"></h2>
+      <div class="detail-price" id="detailPrice"></div>
+      <div>
+        <div class="detail-size-label">Select Size</div>
+        <select class="detail-size-select" id="detailSizeSelect"></select>
+      </div>
+      <div>
+        <div class="detail-size-label">Select Color</div>
+        <div class="detail-colors" id="detailColorSwatches"></div>
+      </div>
+      <button class="detail-add-to-cart" id="detailAddToCartBtn">Add to Cart</button>
+    </div>
+  </div>
+</div>
+
+<div class="trust-strip" id="trustStrip">
+  <div class="trust-inner">
+    <div class="trust-item">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 20l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></div>
+      <div><h4>Order via WhatsApp</h4><p>Quick and simple, no account needed</p></div>
+    </div>
+    <div class="trust-item">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M7 7V5a2 2 0 012-2h6a2 2 0 012 2v2"/></svg></div>
+      <div><h4>InstaPay / Vodafone Cash</h4><p>Pay right after your order is confirmed</p></div>
+    </div>
+    <div class="trust-item">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg></div>
+      <div><h4>No Refunds</h4><p>All sales are final</p></div>
+    </div>
+    <div class="trust-item">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M21 12.5a8.5 8.5 0 11-8.5-8.5"/><path d="M21 4l-9 9-3-3"/></svg></div>
+      <div><h4>100% Handmade</h4><p>Every piece is one of a kind</p></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">Rubies</div>
+      <p class="desc">Handmade bags with a simple design and a quiet, feminine touch. Every piece is made with care and attention to the smallest details.</p>
+      <p class="no-refund">No refunds — all sales are final.</p>
+      <div class="social-row">
+        <a href="https://www.instagram.com/_rubies___?igsh=MW0xcTQwemIwMzNmdg==" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.5"/><circle cx="17.2" cy="6.8" r="1"/></svg></a>
+        <a href="https://www.facebook.com/share/g/1Cj1AfeCP5/?mibextid=wwXIfr" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M14 9h3V6h-3a3 3 0 00-3 3v2H8v3h3v6h3v-6h2.5l.5-3H14V9z"/></svg></a>
+        <a href="https://www.tiktok.com/@rubies.eg?_r=1&_t=ZS-97ZFW5lmkT6" target="_blank" rel="noopener" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M9 12a4 4 0 104 4V4a4 4 0 004 4"/></svg></a>
+      </div>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <ul>
+        <li>WhatsApp: +20 120 182 8084</li>
+        <li>Alexandria, Egypt</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">© Rubies 2026 — All rights reserved. No refunds, all sales final.</div>
+</footer>
+
+<div class="overlay" id="overlay"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-head">
+    <h3>Your Cart</h3>
+    <button class="close-btn" id="closeCart">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 5l14 14M19 5L5 19"/></svg>
+    </button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-foot">
+    <div class="customer-fields">
+      <input type="text" id="custName" placeholder="Full name" class="cart-input">
+      <input type="text" id="custPhone" placeholder="Phone number" class="cart-input">
+      <textarea id="custAddress" placeholder="Full address (city, area, street, landmark)" class="cart-input cart-textarea"></textarea>
+    </div>
+    <div class="cart-subtotal"><span>Total</span><span class="amt" id="cartTotal">0 EGP</span></div>
+    <button class="checkout-btn" id="checkoutBtn">Send Order on WhatsApp</button>
+    <div class="secure-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="9" width="16" height="11" rx="2"/><path d="M8 9V6a4 4 0 018 0v3"/></svg>
+      <span>Pay via InstaPay or Vodafone Cash after order confirmation</span>
+    </div>
+    <div class="no-refund-note">No refunds — all sales are final.</div>
+  </div>
+</div>
+
+<script>
+const CATEGORIES = ['Shoulder bag', 'Cross bag', 'Clutch', 'Hats', 'Phone strap'];
+
+const COLORS = [
+  {name:'Black', hex:'#1a1a1a'},
+  {name:'White', hex:'#f5f5f5'},
+  {name:'Hot Pink', hex:'#ff69b4'},
+  {name:'Orange', hex:'#ff8c42'},
+  {name:'Red', hex:'#d43d3d'},
+  {name:'Blue', hex:'#4a7ebd'},
+  {name:'Purple', hex:'#8b5cf6'},
+  {name:'Yellow', hex:'#f5d547'},
+  {name:'Pink', hex:'#f0a5c0'},
+  {name:'Beige', hex:'#d5c3a5'},
+];
+
+function ph(seed, c1, c2){
+  return `data:image/svg+xml;utf8,` + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="500" height="590">
+      <defs>
+        <linearGradient id="g${seed}" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="${c1}"/>
+          <stop offset="100%" stop-color="${c2}"/>
+        </linearGradient>
+      </defs>
+      <rect width="500" height="590" fill="url(#g${seed})"/>
+      <text x="50%" y="52%" font-family="Georgia, serif" font-size="26" fill="#8B3A42" text-anchor="middle" opacity="0.55">Rubies</text>
+      <text x="50%" y="58%" font-family="Georgia, serif" font-size="13" fill="#8B3A42" text-anchor="middle" opacity="0.4">product photo here</text>
+    </svg>`);
+}
+
+const PRODUCTS = [
+  { id:1, name:'Circle Bag', cat:'Shoulder bag', price:300, oldPrice:350,
+    colors:[0,1,2,3,4,5,6,7,8,9], sizes:['One size'],
+    img: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2027,%202026,%2010_54_42%20PM.png',
+    colorImages: {
+      0: 'https://ik.imagekit.io/fojb8puzo/2d1a4cbb-cbdc-47bc-ba79-e92dee9b178f.png',
+      1: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_04_38%20AM.png',
+      2: 'https://ik.imagekit.io/fojb8puzo/c8de80f0-559a-4b3c-9f0a-446c63d8adb1.png',
+      3: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_08_32%20AM.png',
+      4: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_09_32%20AM.png',
+      5: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_12_16%20AM.png',
+      6: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_19_53%20AM.png',
+      7: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_29_40%20AM.png',
+      8: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2027,%202026,%2010_54_42%20PM.png',
+      9: 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2028,%202026,%2003_32_21%20AM.png'
+    },
+    badge:'New', date:1
+  },
+  { id:2, name:'Mini Shoulder Bag', cat:'Shoulder bag', price:280, oldPrice:350,
+    colors:[1,9], sizes:['S 150 cm', 'M 170 cm'],
+    img: ph(2,'#d5c3a5','#f5f5f5'),
+    colorImages: { 1: 'https://via.placeholder.com/500x590/f5f5f5/000?text=White', 9: 'https://via.placeholder.com/500x590/d5c3a5/000?text=Beige' },
+    badge:'Sale', date:2
+  },
+  { id:3, name:'Crossbody Red', cat:'Cross bag', price:890, oldPrice:null,
+    colors:[0,4], sizes:['S','M'],
+    img: ph(3,'#d43d3d','#1a1a1a'),
+    colorImages: { 0: 'https://via.placeholder.com/500x590/1a1a1a/fff?text=Black', 4: 'https://via.placeholder.com/500x590/d43d3d/fff?text=Red' },
+    badge:'Best Seller', date:3
+  },
+  { id:4, name:'Denim Blue Cross', cat:'Cross bag', price:1250, oldPrice:null,
+    colors:[1,5], sizes:['One size'],
+    img: ph(4,'#f5f5f5','#4a7ebd'),
+    colorImages: { 1: 'https://via.placeholder.com/500x590/f5f5f5/000?text=White', 5: 'https://via.placeholder.com/500x590/4a7ebd/fff?text=Blue' },
+    badge:null, date:4
+  },
+  { id:5, name:'Pink Clutch', cat:'Clutch', price:690, oldPrice:null,
+    colors:[8,1], sizes:['One size'],
+    img: ph(5,'#f0a5c0','#f5f5f5'),
+    colorImages: { 8: 'https://via.placeholder.com/500x590/f0a5c0/fff?text=Pink', 1: 'https://via.placeholder.com/500x590/f5f5f5/000?text=White' },
+    badge:null, date:5
+  },
+  { id:6, name:'Beige Clutch', cat:'Clutch', price:420, oldPrice:480,
+    colors:[9,7], sizes:['One size'],
+    img: ph(6,'#d5c3a5','#f5d547'),
+    colorImages: { 9: 'https://via.placeholder.com/500x590/d5c3a5/000?text=Beige', 7: 'https://via.placeholder.com/500x590/f5d547/000?text=Yellow' },
+    badge:'Sale', date:6
+  },
+  { id:7, name:'Purple Hat', cat:'Hats', price:550, oldPrice:null,
+    colors:[6], sizes:['One size'],
+    img: ph(7,'#8b5cf6','#1a1a1a'),
+    colorImages: { 6: 'https://via.placeholder.com/500x590/8b5cf6/fff?text=Purple+Hat' },
+    badge:'Sold Out', date:7, soldOut:true
+  },
+  { id:8, name:'Summer Hat', cat:'Hats', price:300, oldPrice:null,
+    colors:[0,1,4,5], sizes:['Adjustable'],
+    img: ph(8,'#f5f5f5','#4a7ebd'),
+    colorImages: { 0: 'https://via.placeholder.com/500x590/1a1a1a/fff?text=Black', 1: 'https://via.placeholder.com/500x590/f5f5f5/000?text=White', 4: 'https://via.placeholder.com/500x590/d43d3d/fff?text=Red', 5: 'https://via.placeholder.com/500x590/4a7ebd/fff?text=Blue' },
+    badge:null, date:8
+  },
+  { id:9, name:'Orange Strap', cat:'Phone strap', price:280, oldPrice:null,
+    colors:[3], sizes:['One size'],
+    img: ph(9,'#ff8c42','#f5d547'),
+    colorImages: { 3: 'https://via.placeholder.com/500x590/ff8c42/fff?text=Orange+Strap' },
+    badge:null, date:9
+  },
+  { id:10, name:'Pink Strap', cat:'Phone strap', price:320, oldPrice:360,
+    colors:[8,2], sizes:['One size'],
+    img: ph(10,'#f0a5c0','#ff69b4'),
+    colorImages: { 8: 'https://via.placeholder.com/500x590/f0a5c0/fff?text=Pink', 2: 'https://via.placeholder.com/500x590/ff69b4/fff?text=Hot+Pink' },
+    badge:'Sale', date:10
+  },
+];
+
+let state = {
+  category: '',
+  maxPrice: 700,
+  stock: 'all',
+  sort: 'featured',
+  view: 'home' // 'home' or 'category'
+};
+let cart = [];
+
+const announceMsgs = ['free delivery on orders over 1,000 EGP','free delivery on orders over 1,000 EGP','free delivery on orders over 1,000 EGP','free delivery on orders over 1,000 EGP'];
+document.getElementById('announceTrack').innerHTML = [...announceMsgs, ...announceMsgs].map(m => `<span>${m}</span>`).join('');
+
+// ========== تهيئة الأقسام الرئيسية ==========
+function renderHomeSections() {
+  // Best Sellers
+  const bestSellers = PRODUCTS.filter(p => p.badge === 'Best Seller' && !p.soldOut);
+  const bestRow = document.getElementById('bestSellerRow');
+  bestRow.innerHTML = bestSellers.map(p => {
+    const badge = p.badge ? `<span class="badge">${p.badge}</span>` : '';
+    const priceHtml = `<span class="price-now">${p.price.toLocaleString('en-US')} EGP</span>${p.oldPrice ? `<span class="price-old">${p.oldPrice.toLocaleString('en-US')} EGP</span>` : ''}`;
+    return `
+      <div class="product-card-small" data-id="${p.id}">
+        <div class="product-img-wrap">
+          ${badge}
+          <img src="${p.img}" alt="${bagName(p)}">
+        </div>
+        <div class="product-info">
+          <div class="product-cat">${p.cat}</div>
+          <h3 class="product-title">${bagName(p)}</h3>
+          <div class="product-price">${priceHtml}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  bestRow.querySelectorAll('.product-card-small').forEach(card => {
+    card.addEventListener('click', () => {
+      const id = parseInt(card.dataset.id);
+      const product = PRODUCTS.find(p => p.id === id);
+      if(product) openProductPage(product);
+    });
+  });
+
+  // Categories
+  const categoryRow = document.getElementById('categoryRow');
+  categoryRow.innerHTML = CATEGORIES.map(cat => {
+    const imgSrc = `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="300" height="375"><rect width="300" height="375" fill="${getCategoryColor(cat)}"/><text x="150" y="190" font-family="Georgia" font-size="20" fill="#8B3A42" text-anchor="middle">${cat}</text></svg>`)}`;
+    return `
+      <div class="category-card" data-cat="${cat}">
+        <img src="${imgSrc}" alt="${cat}">
+        <div class="cat-name">${cat}</div>
+      </div>`;
+  }).join('');
+
+  categoryRow.querySelectorAll('.category-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const cat = card.dataset.cat;
+      showCategoryProducts(cat);
+    });
+  });
+
+  // Scroll arrows functionality
+  setupScroll('bestSellerRow', 'bestSellerLeft', 'bestSellerRight');
+  setupScroll('categoryRow', 'categoryLeft', 'categoryRight');
+}
+
+function getCategoryColor(cat) {
+  const colors = ['#F8E3E6','#EADFCB','#E9C6CB','#F0E5D8','#FFFDFB'];
+  const idx = CATEGORIES.indexOf(cat) % colors.length;
+  return colors[idx];
+}
+
+function setupScroll(rowId, leftBtnId, rightBtnId) {
+  const row = document.getElementById(rowId);
+  const leftBtn = document.getElementById(leftBtnId);
+  const rightBtn = document.getElementById(rightBtnId);
+  leftBtn.addEventListener('click', () => row.scrollBy({ left: -250, behavior: 'smooth' }));
+  rightBtn.addEventListener('click', () => row.scrollBy({ left: 250, behavior: 'smooth' }));
+}
+
+// ========== التنقل إلى صفحة القسم ==========
+function showCategoryProducts(cat) {
+  state.category = cat;
+  state.view = 'category';
+  document.getElementById('homeSections').style.display = 'none';
+  document.getElementById('categoryProductsPage').classList.add('show');
+  document.getElementById('pageTitle').textContent = cat;
+  document.getElementById('breadcrumbCat').textContent = cat;
+  renderCategories();
+  renderProducts();
+}
+
+// ========== العودة إلى الصفحة الرئيسية ==========
+function goHome() {
+  state.view = 'home';
+  state.category = '';
+  document.getElementById('homeSections').style.display = 'block';
+  document.getElementById('categoryProductsPage').classList.remove('show');
+  document.getElementById('trustStrip').style.display = 'block';
+  window.scrollTo(0,0);
+}
+
+// ========== الفلاتر والسلة وباقي الوظائف ==========
+function renderCategories(){
+  const list = document.getElementById('categoryList');
+  const all = ['All', ...CATEGORIES];
+  list.innerHTML = all.map(cat => {
+    const count = cat === 'All' ? PRODUCTS.length : PRODUCTS.filter(p => p.cat === cat).length;
+    const active = (cat === 'All' && !state.category) || cat === state.category ? 'active' : '';
+    return `<li><button class="${active}" data-cat="${cat === 'All' ? '' : cat}">${cat} <span class="count">${count}</span></button></li>`;
+  }).join('');
+  list.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.category = btn.dataset.cat;
+      document.getElementById('pageTitle').textContent = state.category || 'Shop';
+      document.getElementById('breadcrumbCat').textContent = state.category || 'Shop';
+      renderCategories();
+      renderProducts();
+    });
+  });
+}
+
+document.getElementById('priceRange').addEventListener('input', e => {
+  state.maxPrice = parseInt(e.target.value);
+  document.getElementById('priceMax').textContent = state.maxPrice.toLocaleString('en-US') + ' EGP';
+  renderProducts();
+});
+
+document.querySelectorAll('.filter-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-toggle').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.stock = btn.dataset.stock;
+    renderProducts();
+  });
+});
+
+document.getElementById('sortSelect').addEventListener('change', e => {
+  state.sort = e.target.value;
+  renderProducts();
+});
+
+function getFiltered(){
+  let list = PRODUCTS.filter(p => {
+    if(state.category && p.cat !== state.category) return false;
+    if(p.price > state.maxPrice && !p.soldOut) return false;
+    if(state.stock === 'in' && p.soldOut) return false;
+    return true;
+  });
+  if(state.sort === 'price-asc') list.sort((a,b) => a.price - b.price);
+  if(state.sort === 'price-desc') list.sort((a,b) => b.price - a.price);
+  if(state.sort === 'new') list.sort((a,b) => a.date - b.date);
+  return list;
+}
+
+function bagName(p){
+  return p.name || `Bag ${p.id}`;
+}
+
+function renderProducts(){
+  if(state.view !== 'category') return;
+  const grid = document.getElementById('productGrid');
+  const list = getFiltered();
+  document.getElementById('resultCount').textContent = `Showing ${list.length} of ${PRODUCTS.length} products`;
+  document.getElementById('cntAll').textContent = PRODUCTS.length;
+  document.getElementById('cntIn').textContent = PRODUCTS.filter(p=>!p.soldOut).length;
+
+  if(list.length === 0){
+    grid.innerHTML = `<div class="empty-state"><div class="ico">✦</div><h3>No matching products</h3><p>Try adjusting the filters or price range to see more items</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(p => {
+    const badge = p.badge ? `<span class="badge ${p.soldOut?'sold-out':''}">${p.badge}</span>` : '';
+    const priceHtml = p.soldOut
+      ? `<span class="price-old">Currently unavailable</span>`
+      : `<span class="price-now">${p.price.toLocaleString('en-US')} EGP</span>${p.oldPrice ? `<span class="price-old">${p.oldPrice.toLocaleString('en-US')} EGP</span>` : ''}`;
+
+    return `
+      <article class="product-card" data-id="${p.id}">
+        <div class="product-img-wrap">
+          ${badge}
+          <img src="${p.img}" alt="${bagName(p)}" loading="lazy">
+        </div>
+        <div class="product-info">
+          <div class="product-cat">${p.cat}</div>
+          <h3 class="product-title">${bagName(p)}</h3>
+          <div class="product-price">${priceHtml}</div>
+        </div>
+      </article>`;
+  }).join('');
+
+  grid.querySelectorAll('.product-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const id = parseInt(card.dataset.id);
+      const product = PRODUCTS.find(p => p.id === id);
+      if(product && !product.soldOut) openProductPage(product);
+    });
+  });
+}
+
+// ========== تفاصيل المنتج ==========
+let currentDetailProduct = null;
+let currentDetailSelectedColor = 0;
+
+function openProductPage(product){
+  currentDetailProduct = product;
+  currentDetailSelectedColor = product.colors[0];
+  
+  document.getElementById('detailCat').textContent = product.cat;
+  document.getElementById('detailName').textContent = bagName(product);
+  
+  const priceHtml = product.oldPrice 
+    ? `<span class="current">${product.price.toLocaleString('en-US')} EGP</span> <span class="old">${product.oldPrice.toLocaleString('en-US')} EGP</span>`
+    : `<span class="current">${product.price.toLocaleString('en-US')} EGP</span>`;
+  document.getElementById('detailPrice').innerHTML = priceHtml;
+  
+  const sizeSelect = document.getElementById('detailSizeSelect');
+  sizeSelect.innerHTML = product.sizes.map(s => `<option value="${s}">${s}</option>`).join('');
+  sizeSelect.disabled = product.sizes.length === 1;
+  
+  const colorContainer = document.getElementById('detailColorSwatches');
+  colorContainer.innerHTML = product.colors.map(colorIdx => {
+    const selectedClass = colorIdx === currentDetailSelectedColor ? 'selected' : '';
+    return `<button class="detail-color-swatch ${selectedClass}" style="background:${COLORS[colorIdx].hex}" data-color="${colorIdx}" title="${COLORS[colorIdx].name}"></button>`;
+  }).join('');
+  
+  updateDetailImage();
+  
+  document.getElementById('shopPage').style.display = 'none';
+  document.getElementById('productDetailPage').classList.add('show');
+  document.getElementById('trustStrip').style.display = 'none';
+  window.scrollTo(0,0);
+  
+  colorContainer.querySelectorAll('.detail-color-swatch').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const colorIdx = parseInt(btn.dataset.color);
+      currentDetailSelectedColor = colorIdx;
+      colorContainer.querySelectorAll('.detail-color-swatch').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      updateDetailImage();
+    });
+  });
+}
+
+function updateDetailImage(){
+  const img = document.getElementById('detailImg');
+  const product = currentDetailProduct;
+  const colorIdx = currentDetailSelectedColor;
+  const colorImages = product.colorImages || {};
+  img.src = colorImages[colorIdx] || product.img;
+}
+
+document.getElementById('backToShopBtn').addEventListener('click', () => {
+  document.getElementById('productDetailPage').classList.remove('show');
+  document.getElementById('shopPage').style.display = 'block';
+  document.getElementById('trustStrip').style.display = 'block';
+  if(state.view === 'category') {
+    document.getElementById('categoryProductsPage').classList.add('show');
+  } else {
+    document.getElementById('homeSections').style.display = 'block';
+  }
+});
+
+document.getElementById('logoHome').addEventListener('click', (e) => {
+  e.preventDefault();
+  document.getElementById('productDetailPage').classList.remove('show');
+  document.getElementById('shopPage').style.display = 'block';
+  goHome();
+});
+
+document.getElementById('homeBreadcrumb').addEventListener('click', (e) => {
+  e.preventDefault();
+  goHome();
+});
+
+document.getElementById('detailAddToCartBtn').addEventListener('click', () => {
+  const product = currentDetailProduct;
+  if(!product) return;
+  const size = document.getElementById('detailSizeSelect').value;
+  const colorName = COLORS[currentDetailSelectedColor].name;
+  const imgSrc = document.getElementById('detailImg').src;
+  addToCart(product.id, size, colorName, imgSrc);
+});
+
+// ========== السلة ==========
+function addToCart(productId, size, color, imageSrc){
+  const product = PRODUCTS.find(p => p.id === productId);
+  if(!product || product.soldOut) return;
+  const existing = cart.find(c => c.id === productId && c.size === size && c.color === color);
+  if(existing) existing.qty++;
+  else cart.push({ id:product.id, cat:product.cat, price:product.price, img:imageSrc, name:bagName(product), size, color, qty:1 });
+  renderCart();
+  openCart();
+}
+
+function changeQty(idx, delta){
+  if(idx<0 || idx>=cart.length) return;
+  cart[idx].qty += delta;
+  if(cart[idx].qty <= 0) cart.splice(idx,1);
+  renderCart();
+}
+
+function renderCart(){
+  const wrap = document.getElementById('cartItems');
+  const countEl = document.getElementById('cartCount');
+  const totalEl = document.getElementById('cartTotal');
+  countEl.textContent = cart.reduce((s,c) => s + c.qty, 0);
+  if(!cart.length){
+    wrap.innerHTML = '<div class="cart-empty">Your cart is empty.<br>Now\'s a good time to add a piece you love.</div>';
+    totalEl.textContent = '0 EGP';
+    return;
+  }
+  wrap.innerHTML = cart.map((c,idx) => `
+    <div class="cart-item">
+      <img src="${c.img}" alt="${c.name}">
+      <div class="cart-item-info">
+        <h5>${c.name}</h5>
+        <div>${c.price.toLocaleString('en-US')} EGP</div>
+        <div class="variant">Size: ${c.size} | Color: ${c.color}</div>
+        <div class="qty-row">
+          <button class="qty-btn" data-act="dec" data-idx="${idx}">−</button>
+          <span>${c.qty}</span>
+          <button class="qty-btn" data-act="inc" data-idx="${idx}">+</button>
+        </div>
+      </div>
+    </div>`).join('');
+  wrap.querySelectorAll('.qty-btn').forEach(btn => {
+    btn.addEventListener('click', () => changeQty(parseInt(btn.dataset.idx), btn.dataset.act==='inc'?1:-1));
+  });
+  totalEl.textContent = cart.reduce((s,c) => s + c.price*c.qty, 0).toLocaleString('en-US') + ' EGP';
+}
+
+function openCart(){ document.getElementById('cartDrawer').classList.add('show'); document.getElementById('overlay').classList.add('show'); }
+function closeCartFn(){ document.getElementById('cartDrawer').classList.remove('show'); document.getElementById('overlay').classList.remove('show'); }
+document.getElementById('cartBtn').addEventListener('click', openCart);
+document.getElementById('closeCart').addEventListener('click', closeCartFn);
+document.getElementById('overlay').addEventListener('click', ()=>{ closeCartFn(); closeMobileFilter(); });
+
+const WHATSAPP_NUMBER = '201201828084';
+document.getElementById('checkoutBtn').addEventListener('click', () => {
+  if(!cart.length) { alert('Your cart is empty.'); return; }
+  const name = document.getElementById('custName').value.trim();
+  const phone = document.getElementById('custPhone').value.trim();
+  const address = document.getElementById('custAddress').value.trim();
+  if(!name||!phone||!address){ alert('Please fill in your details.'); return; }
+  const total = cart.reduce((s,c) => s + c.price*c.qty, 0);
+  let msg = `Hi, I'd like to confirm the following order from Rubies:\n\n`;
+  cart.forEach((c,i) => msg += `${i+1}) ${c.name}\n   Size: ${c.size} | Color: ${c.color}\n   Qty: ${c.qty}\n   Price: ${(c.price*c.qty).toLocaleString('en-US')} EGP\n\n`);
+  msg += `Total: ${total.toLocaleString('en-US')} EGP\n\nName: ${name}\nPhone: ${phone}\nAddress: ${address}\n\nNote: all sales are final, no refunds.\nWaiting for confirmation on payment.`;
+  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+});
+
+function openMobileFilter(){ document.getElementById('sidebar').classList.add('show'); document.getElementById('overlay').classList.add('show'); }
+function closeMobileFilter(){ document.getElementById('sidebar').classList.remove('show'); if(!document.getElementById('cartDrawer').classList.contains('show')) document.getElementById('overlay').classList.remove('show'); }
+document.getElementById('mobileFilterOpen').addEventListener('click', openMobileFilter);
+
+// ========== البداية ==========
+renderHomeSections();
+renderCategories();
+renderCart();
+</script>
+
+</body>
+</html>
