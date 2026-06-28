@@ -556,17 +556,19 @@
     position:relative;
     overflow:hidden;
     border-radius:18px;
+    touch-action:pan-y pinch-zoom;
   }
   .slider-track{
     display:flex;
     transition:transform 0.3s ease;
-    touch-action:pan-y;
+    will-change:transform;
   }
   .slider-track img{
     width:100%;
     flex-shrink:0;
     object-fit:cover;
     border-radius:18px;
+    pointer-events:none;
   }
   .slider-dots{
     display:flex;
@@ -1194,7 +1196,22 @@
 </div>
 
 <script>
+/* ============ إعدادات سهلة التعديل ============ */
+
+// الفئات
 const CATEGORIES = ['Shoulder bag', 'Cross bag', 'Clutch', 'Hats', 'Phone strap'];
+
+// معرفات المنتجات التي ستظهر في Best Sellers (يمكنك تغيير الأرقام هنا)
+const BEST_SELLER_IDS = [9, 1];
+
+// صور الفئات (ضع رابط الصورة المناسب لكل فئة)
+const CATEGORY_IMAGES = {
+  'Shoulder bag': 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2027,%202026,%2010_54_42%20PM.png',
+  'Cross bag': '',
+  'Clutch': '',
+  'Hats': '',
+  'Phone strap': 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%205.10.15%20AM.jpeg'
+};
 
 const COLORS = [
   {name:'Black', hex:'#1a1a1a'},
@@ -1316,7 +1333,8 @@ document.getElementById('announceTrack').innerHTML = [...announceMsgs, ...announ
 
 // ========== تهيئة الأقسام الرئيسية ==========
 function renderHomeSections() {
-  const bestSellers = PRODUCTS.filter(p => !p.soldOut).slice(0, 6);
+  // Best Sellers - يستخدم BEST_SELLER_IDS
+  const bestSellers = BEST_SELLER_IDS.map(id => PRODUCTS.find(p => p.id === id)).filter(p => p && !p.soldOut);
   const bestRow = document.getElementById('bestSellerRow');
   bestRow.innerHTML = bestSellers.map(p => {
     const badge = p.badge ? `<span class="badge">${p.badge}</span>` : '';
@@ -1343,9 +1361,10 @@ function renderHomeSections() {
     });
   });
 
+  // Categories - يستخدم CATEGORY_IMAGES
   const categoryRow = document.getElementById('categoryRow');
   categoryRow.innerHTML = CATEGORIES.map(cat => {
-    const imgSrc = `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="300" height="375"><rect width="300" height="375" fill="${getCategoryColor(cat)}"/><text x="150" y="190" font-family="Georgia" font-size="20" fill="#8B3A42" text-anchor="middle">${cat}</text></svg>`)}`;
+    const imgSrc = CATEGORY_IMAGES[cat] || `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="300" height="375"><rect width="300" height="375" fill="${getCategoryColor(cat)}"/><text x="150" y="190" font-family="Georgia" font-size="20" fill="#8B3A42" text-anchor="middle">${cat}</text></svg>`)}`;
     return `
       <div class="category-card" data-cat="${cat}">
         <img src="${imgSrc}" alt="${cat}">
@@ -1522,6 +1541,7 @@ let sliderImages = [];
 let currentSlide = 0;
 let touchStartX = 0;
 let touchEndX = 0;
+let isSwiping = false;
 
 function openProductPage(product){
   currentDetailProduct = product;
@@ -1567,7 +1587,7 @@ function openProductPage(product){
   
   colorContainer.querySelectorAll('.detail-color-swatch').forEach(btn => {
     btn.addEventListener('click', () => {
-      if(isCustomized) return; // لا تغيير للون إذا كان مخصصاً
+      if(isCustomized) return;
       const colorIdx = parseInt(btn.dataset.color);
       currentDetailSelectedColor = colorIdx;
       colorContainer.querySelectorAll('.detail-color-swatch').forEach(b => b.classList.remove('selected'));
@@ -1588,12 +1608,10 @@ function openProductPage(product){
     if(isCustomized){
       check.classList.add('checked');
       notesField.style.display = 'block';
-      // إلغاء تحديد الألوان
       document.querySelectorAll('.detail-color-swatch').forEach(b => b.classList.remove('selected'));
     } else {
       check.classList.remove('checked');
       notesField.style.display = 'none';
-      // إعادة تحديد اللون الأول
       const firstSwatch = document.querySelector(`.detail-color-swatch[data-color="${currentDetailSelectedColor}"]`);
       if(firstSwatch) firstSwatch.classList.add('selected');
     }
@@ -1604,7 +1622,7 @@ function renderSlider(){
   const track = document.getElementById('sliderTrack');
   const dotsContainer = document.getElementById('sliderDots');
   
-  track.innerHTML = sliderImages.map(src => `<img src="${src}" alt="Product image">`).join('');
+  track.innerHTML = sliderImages.map(src => `<img src="${src}" alt="Product image" draggable="false">`).join('');
   track.style.transform = `translateX(-${currentSlide * 100}%)`;
   
   dotsContainer.innerHTML = sliderImages.map((_, i) => 
@@ -1618,14 +1636,34 @@ function renderSlider(){
     });
   });
   
-  track.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-  }, {passive: true});
+  // إزالة الأحداث السابقة لتجنب التراكم
+  track.removeEventListener('touchstart', onTouchStart);
+  track.removeEventListener('touchend', onTouchEnd);
+  track.removeEventListener('touchmove', onTouchMove);
   
-  track.addEventListener('touchend', (e) => {
-    touchEndX = e.changedTouches[0].screenX;
-    handleSwipe();
-  }, {passive: true});
+  track.addEventListener('touchstart', onTouchStart, {passive: false});
+  track.addEventListener('touchend', onTouchEnd, {passive: false});
+  track.addEventListener('touchmove', onTouchMove, {passive: false});
+}
+
+function onTouchStart(e){
+  touchStartX = e.changedTouches[0].screenX;
+  isSwiping = false;
+}
+
+function onTouchMove(e){
+  // منع التمرير العمودي أثناء السحب الأفقي
+  const touchCurrentX = e.changedTouches[0].screenX;
+  const diffX = Math.abs(touchCurrentX - touchStartX);
+  if(diffX > 10){
+    e.preventDefault();
+    isSwiping = true;
+  }
+}
+
+function onTouchEnd(e){
+  touchEndX = e.changedTouches[0].screenX;
+  if(isSwiping) handleSwipe();
 }
 
 function updateSliderPosition(){
@@ -1638,7 +1676,7 @@ function updateSliderPosition(){
 
 function handleSwipe(){
   const diff = touchStartX - touchEndX;
-  if(Math.abs(diff) > 50){
+  if(Math.abs(diff) > 40){
     if(diff > 0 && currentSlide < sliderImages.length - 1){
       currentSlide++;
     } else if(diff < 0 && currentSlide > 0){
