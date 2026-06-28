@@ -67,19 +67,6 @@
     opacity:0.45;
   }
 
-  /* شريط التحذير من الرفريش */
-  .refresh-warning{
-    background:var(--ruby-deep);
-    color:var(--cream);
-    text-align:center;
-    padding:8px 16px;
-    font-size:0.75rem;
-    display:none;
-    z-index:101;
-    position:relative;
-  }
-  .refresh-warning.show{ display:block; }
-
   .announce{
     background:var(--ruby);
     color:var(--cream);
@@ -936,22 +923,6 @@
     transition:background .2s;
   }
   .checkout-btn:hover{background:var(--ruby-deep);}
-  .continue-shopping-btn{
-    width:100%;
-    background:var(--cream);
-    color:var(--ruby-deep);
-    border:1px solid var(--ruby-deep);
-    padding:14px 0;
-    border-radius:30px;
-    font-size:0.95rem;
-    letter-spacing:0.02em;
-    transition:background .2s;
-    margin-bottom:8px;
-    cursor:pointer;
-  }
-  .continue-shopping-btn:hover{
-    background:var(--blush-deep);
-  }
   .secure-note{
     display:flex;
     align-items:center;
@@ -1021,10 +992,6 @@
 </head>
 <body>
 
-<div id="refreshWarning" class="refresh-warning">
-  ⚠️ You have items in your cart. Refreshing the page will clear your customer details but the items will be restored.
-</div>
-
 <div class="announce">
   <div class="announce-track" id="announceTrack"></div>
 </div>
@@ -1078,7 +1045,7 @@
       <div class="head-stitch stitch"></div>
     </div>
     <div class="no-refund-banner">
-      <div class="inner">All sales are final — no refunds. Exchanges may be available, please contact us via WhatsApp before ordering if you have questions.</div>
+      <div class="inner">All sales are final — no refund or Exchange, please contact us via WhatsApp before ordering if you have questions.</div>
     </div>
     <div class="shop-wrap">
       <aside class="sidebar" id="sidebar">
@@ -1132,6 +1099,10 @@
       <div class="detail-cat" id="detailCat"></div>
       <h2 id="detailName"></h2>
       <div class="detail-price" id="detailPrice"></div>
+      <div id="detailTypeContainer" style="display:none;">
+        <div class="detail-size-label">Select Type</div>
+        <select class="detail-size-select" id="detailTypeSelect"></select>
+      </div>
       <div>
         <div class="detail-size-label">Select Size</div>
         <select class="detail-size-select" id="detailSizeSelect"></select>
@@ -1176,7 +1147,7 @@
     <div>
       <div class="footer-logo">Rubies</div>
       <p class="desc">Handmade bags with a simple design and a quiet, feminine touch. Every piece is made with care and attention to the smallest details.</p>
-      <p class="no-refund">No refunds — all sales are final.</p>
+      <p class="no-refund">No refund or Exchange — all sales are final.</p>
       <div class="social-row">
         <a href="https://www.instagram.com/_rubies___?igsh=MW0xcTQwemIwMzNmdg==" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.5"/><circle cx="17.2" cy="6.8" r="1"/></svg></a>
         <a href="https://www.facebook.com/share/g/1Cj1AfeCP5/?mibextid=wwXIfr" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M14 9h3V6h-3a3 3 0 00-3 3v2H8v3h3v6h3v-6h2.5l.5-3H14V9z"/></svg></a>
@@ -1191,7 +1162,7 @@
       </ul>
     </div>
   </div>
-  <div class="footer-bottom">© Rubies 2026 — All rights reserved. No refunds, all sales final.</div>
+  <div class="footer-bottom">© Rubies 2026 — All rights reserved. No refund  or Exchange, all sales final.</div>
 </footer>
 
 <div class="overlay" id="overlay"></div>
@@ -1210,13 +1181,12 @@
       <textarea id="custAddress" placeholder="Full address (city, area, street, landmark)" class="cart-input cart-textarea"></textarea>
     </div>
     <div class="cart-subtotal"><span>Total</span><span class="amt" id="cartTotal">0 EGP</span></div>
-    <button class="continue-shopping-btn" id="continueShoppingBtn">Continue Shopping</button>
     <button class="checkout-btn" id="checkoutBtn">Send Order on WhatsApp</button>
     <div class="secure-note">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="9" width="16" height="11" rx="2"/><path d="M8 9V6a4 4 0 018 0v3"/></svg>
       <span>Pay via InstaPay or Vodafone Cash after order confirmation</span>
     </div>
-    <div class="no-refund-note">No refunds — all sales are final.</div>
+    <div class="no-refund-note">No refund or Exchange — all sales are final.</div>
   </div>
 </div>
 
@@ -1226,8 +1196,8 @@ const BEST_SELLER_IDS = [9, 1];
 const CATEGORY_IMAGES = {
   'Shoulder bag': 'https://ik.imagekit.io/fojb8puzo/ChatGPT%20Image%20Jun%2027,%202026,%2010_54_42%20PM.png',
   'Cross bag': '',
-  'Clutch': '',
-  'Hats': '',
+  'Clutch': 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%201.00.48%20AM.jpeg',
+  'Hats': 'https://ik.imagekit.io/fojb8puzo/DSC0510.jpg',
   'Phone strap': 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%205.10.15%20AM.jpeg'
 };
 
@@ -1295,10 +1265,15 @@ const PRODUCTS = [
     colorImages: { 1: 'https://via.placeholder.com/500x590/f5f5f5/000?text=White', 5: 'https://via.placeholder.com/500x590/4a7ebd/fff?text=Blue' },
     badge:null, date:4
   },
-  { id:5, name:'Pink Clutch', cat:'Clutch', price:690, oldPrice:null,
-    colors:[8,1], sizes:['One size'],
-    img: ph(5,'#f0a5c0','#f5f5f5'),
-    colorImages: { 8: 'https://via.placeholder.com/500x590/f0a5c0/fff?text=Pink', 1: 'https://via.placeholder.com/500x590/f5f5f5/000?text=White' },
+  { id:5, name:'Summer Clutch', cat:'Clutch',
+    sizePrices: { '15 cm': 300, '20 cm': 400, '25 cm': 500 },
+    colors:[0,1,2,3,4,5,6,7,8], sizes:['15 cm','20 cm','25 cm'],
+    img: 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%201.00.48%20AM.jpeg',
+    extraImages: [
+       'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%202.12.15%20AM.jpeg', 
+      'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%202.12.44%20AM.jpeg',
+      'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%201.00.48%20AM%20(1).jpeg'
+    ],
     badge:null, date:5
   },
   { id:6, name:'Beige Clutch', cat:'Clutch', price:420, oldPrice:480,
@@ -1307,19 +1282,32 @@ const PRODUCTS = [
     colorImages: { 9: 'https://via.placeholder.com/500x590/d5c3a5/000?text=Beige', 7: 'https://via.placeholder.com/500x590/f5d547/000?text=Yellow' },
     badge:'Sale', date:6
   },
-  { id:7, name:'Purple Hat', cat:'Hats', price:550, oldPrice:null,
-    colors:[6], sizes:['One size'],
-    img: ph(7,'#8b5cf6','#1a1a1a'),
-    colorImages: { 6: 'https://via.placeholder.com/500x590/8b5cf6/fff?text=Purple+Hat' },
-    badge:'Sold Out', date:7, soldOut:true
+  { id:7, name:'Mesh Hat', cat:'Hats', price:100, oldPrice:null,
+  priceOptions: [
+      { name: 'Without', price: 100 },
+      { name: 'With Charms', price: 110 }
+    ],
+    colors:[0,1,5,6,7,8,9], sizes:['One size'],
+    img: 'https://ik.imagekit.io/fojb8puzo/DSC0510.jpg',
+    extraImages: [
+      'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%2012.55.03%20AM%20(1).jpeg',
+      'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%2012.55.03%20AM%20(2).jpeg',
+      'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%2012.55.03%20AM%20(3).jpeg',
+      'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%2012.55.02%20AM.jpeg',
+      'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%2012.55.03%20AM.jpeg'
+    ],
+    badge:null, date:7
   },
-  { id:8, name:'Summer Hat', cat:'Hats', price:300, oldPrice:null,
-    colors:[0,1,4,5], sizes:['Adjustable'],
-    img: ph(8,'#f5f5f5','#4a7ebd'),
-    colorImages: { 0: 'https://via.placeholder.com/500x590/1a1a1a/fff?text=Black', 1: 'https://via.placeholder.com/500x590/f5f5f5/000?text=White', 4: 'https://via.placeholder.com/500x590/d43d3d/fff?text=Red', 5: 'https://via.placeholder.com/500x590/4a7ebd/fff?text=Blue' },
+  { id:8, name:'Rolled Phone Strap', cat:'Phone strap', 
+    priceOptions: [
+      { name: 'Hand', price: 70 },
+      { name: 'Cross', price: 110 }
+    ],
+    colors:[1,2,3,4,5,7,8], sizes:['One size'],
+    img: 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%205.11.43%20AM%20(1).jpeg',
     badge:null, date:8
   },
-  { id:9, name:'Cross Phone Strap', cat:'Phone strap', price:100, oldPrice:120,
+  { id:9, name:'Cross Phone Strap', cat:'Phone strap', price:100, oldPrice:null,
     colors:[1,2,3,4,5,7,8], sizes:['100 cm','120 cm','140 cm'],
     img: 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%205.10.15%20AM.jpeg',
     extraImages: [
@@ -1329,12 +1317,12 @@ const PRODUCTS = [
     ],
     badge:'Best Seller', date:9
   },
-  { id:10, name:'Pink Strap', cat:'Phone strap', price:320, oldPrice:360,
+  { id:10, name:'Hand Phone Strap', cat:'Phone strap', price:60, oldPrice:80,
     colors:[1,2,3,4,5,7,8], sizes:['One size'],
-    img: '',
-    colorImages: {},
+    img: 'https://ik.imagekit.io/fojb8puzo/WhatsApp%20Image%202026-06-28%20at%204.45.54%20AM%20(1).jpeg',
     badge:'Sale', date:10
   },
+
 ];
 
 let state = {
@@ -1346,58 +1334,31 @@ let state = {
 };
 let cart = [];
 
-function saveCartToStorage() {
-  localStorage.setItem('rubies_cart', JSON.stringify(cart));
-}
-function loadCartFromStorage() {
-  const saved = localStorage.getItem('rubies_cart');
-  if (saved) {
-    try {
-      cart = JSON.parse(saved);
-      cart.forEach(c => {
-        if (!c.img || c.img === '') {
-          const product = PRODUCTS.find(p => p.id === c.id);
-          if (product && product.img) c.img = product.img;
-        }
-      });
-    } catch(e) {}
-  }
-}
-function saveCustomerFields() {
-  const fields = {
-    name: document.getElementById('custName').value,
-    phone: document.getElementById('custPhone').value,
-    address: document.getElementById('custAddress').value
-  };
-  if (fields.name || fields.phone || fields.address) {
-    localStorage.setItem('rubies_customer', JSON.stringify(fields));
-  }
-}
-function loadCustomerFields() {
-  const saved = localStorage.getItem('rubies_customer');
-  if (saved) {
-    try {
-      const fields = JSON.parse(saved);
-      document.getElementById('custName').value = fields.name || '';
-      document.getElementById('custPhone').value = fields.phone || '';
-      document.getElementById('custAddress').value = fields.address || '';
-    } catch(e) {}
-  }
+function getProductMinPrice(p){
+  if(p.sizePrices) return Math.min(...Object.values(p.sizePrices));
+  if(p.priceOptions) return Math.min(...p.priceOptions.map(o => o.price));
+  return p.price || 0;
 }
 
-function updateWarningBanner() {
-  const warning = document.getElementById('refreshWarning');
-  if (cart.length > 0) {
-    warning.classList.add('show');
-  } else {
-    warning.classList.remove('show');
-  }
+function getProductMaxPrice(p){
+  if(p.sizePrices) return Math.max(...Object.values(p.sizePrices));
+  if(p.priceOptions) return Math.max(...p.priceOptions.map(o => o.price));
+  return p.price || 0;
 }
 
-window.addEventListener('beforeunload', () => {
-  saveCartToStorage();
-  saveCustomerFields();
-});
+function getPriceDisplay(p){
+  if(p.soldOut) return 'Currently unavailable';
+  const min = getProductMinPrice(p);
+  const max = getProductMaxPrice(p);
+  if(min === max) return `${min.toLocaleString('en-US')} EGP`;
+  return `${min.toLocaleString('en-US')} - ${max.toLocaleString('en-US')} EGP`;
+}
+
+function getInitialDetailPrice(p){
+  if(p.sizePrices) return p.sizePrices[p.sizes[0]];
+  if(p.priceOptions) return p.priceOptions[0].price;
+  return p.price || 0;
+}
 
 const announceMsgs = ['Free delivery on orders over 1,000 EGP ✨','New arrivals every week 🌸','Free delivery on orders over 1,000 EGP ✨','New arrivals every week 🌸'];
 document.getElementById('announceTrack').innerHTML = [...announceMsgs, ...announceMsgs].map(m => `<span>${m}</span>`).join('');
@@ -1407,7 +1368,7 @@ function renderHomeSections() {
   const bestRow = document.getElementById('bestSellerRow');
   bestRow.innerHTML = bestSellers.map(p => {
     const badge = p.badge ? `<span class="badge">${p.badge}</span>` : '';
-    const priceHtml = `<span class="price-now">${p.price.toLocaleString('en-US')} EGP</span>${p.oldPrice ? `<span class="price-old">${p.oldPrice.toLocaleString('en-US')} EGP</span>` : ''}`;
+    const priceHtml = `<span class="price-now">${getPriceDisplay(p)}</span>`;
     return `
       <div class="product-card-small" data-id="${p.id}">
         <div class="product-img-wrap">
@@ -1543,12 +1504,13 @@ document.getElementById('sortSelect').addEventListener('change', e => {
 function getFiltered(){
   let list = PRODUCTS.filter(p => {
     if(state.category && p.cat !== state.category) return false;
-    if(p.price > state.maxPrice && !p.soldOut) return false;
+    const productPrice = getProductMinPrice(p);
+    if(productPrice > state.maxPrice && !p.soldOut) return false;
     if(state.stock === 'in' && p.soldOut) return false;
     return true;
   });
-  if(state.sort === 'price-asc') list.sort((a,b) => a.price - b.price);
-  if(state.sort === 'price-desc') list.sort((a,b) => b.price - a.price);
+  if(state.sort === 'price-asc') list.sort((a,b) => getProductMinPrice(a) - getProductMinPrice(b));
+  if(state.sort === 'price-desc') list.sort((a,b) => getProductMinPrice(b) - getProductMinPrice(a));
   if(state.sort === 'new') list.sort((a,b) => a.date - b.date);
   return list;
 }
@@ -1574,7 +1536,7 @@ function renderProducts(){
     const badge = p.badge ? `<span class="badge ${p.soldOut?'sold-out':''}">${p.badge}</span>` : '';
     const priceHtml = p.soldOut
       ? `<span class="price-old">Currently unavailable</span>`
-      : `<span class="price-now">${p.price.toLocaleString('en-US')} EGP</span>${p.oldPrice ? `<span class="price-old">${p.oldPrice.toLocaleString('en-US')} EGP</span>` : ''}`;
+      : `<span class="price-now">${getPriceDisplay(p)}</span>`;
 
     return `
       <article class="product-card" data-id="${p.id}">
@@ -1604,6 +1566,7 @@ let currentDetailSelectedColor = 0;
 let isCustomized = false;
 let sliderImages = [];
 let currentSlide = 0;
+let currentDetailPrice = 0;
 
 function openProductPage(product){
   currentDetailProduct = product;
@@ -1613,14 +1576,33 @@ function openProductPage(product){
   document.getElementById('detailCat').textContent = product.cat;
   document.getElementById('detailName').textContent = bagName(product);
   
-  const priceHtml = product.oldPrice 
-    ? `<span class="current">${product.price.toLocaleString('en-US')} EGP</span> <span class="old">${product.oldPrice.toLocaleString('en-US')} EGP</span>`
-    : `<span class="current">${product.price.toLocaleString('en-US')} EGP</span>`;
-  document.getElementById('detailPrice').innerHTML = priceHtml;
+  const typeContainer = document.getElementById('detailTypeContainer');
+  const typeSelect = document.getElementById('detailTypeSelect');
+  if (product.priceOptions && product.priceOptions.length > 0) {
+    typeContainer.style.display = 'block';
+    typeSelect.innerHTML = product.priceOptions.map((opt, idx) => 
+      `<option value="${idx}">${opt.name} - ${opt.price} EGP</option>`
+    ).join('');
+    typeSelect.disabled = false;
+    currentDetailPrice = product.priceOptions[0].price;
+  } else {
+    typeContainer.style.display = 'none';
+    currentDetailPrice = getInitialDetailPrice(product);
+  }
+  updateDetailPriceDisplay(product);
   
   const sizeSelect = document.getElementById('detailSizeSelect');
   sizeSelect.innerHTML = product.sizes.map(s => `<option value="${s}">${s}</option>`).join('');
   sizeSelect.disabled = product.sizes.length === 1;
+  
+  if (product.sizePrices) {
+    sizeSelect.onchange = () => {
+      currentDetailPrice = product.sizePrices[sizeSelect.value];
+      updateDetailPriceDisplay(product);
+    };
+    currentDetailPrice = product.sizePrices[sizeSelect.value];
+    updateDetailPriceDisplay(product);
+  }
   
   const colorContainer = document.getElementById('detailColorSwatches');
   colorContainer.innerHTML = product.colors.map(colorIdx => {
@@ -1644,6 +1626,13 @@ function openProductPage(product){
   document.getElementById('productDetailPage').classList.add('show');
   document.getElementById('trustStrip').style.display = 'none';
   window.scrollTo(0,0);
+  
+  if (product.priceOptions) {
+    typeSelect.onchange = () => {
+      currentDetailPrice = product.priceOptions[parseInt(typeSelect.value)].price;
+      updateDetailPriceDisplay(product);
+    };
+  }
   
   colorContainer.querySelectorAll('.detail-color-swatch').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1675,6 +1664,11 @@ function openProductPage(product){
       if(firstSwatch) firstSwatch.classList.add('selected');
     }
   };
+}
+
+function updateDetailPriceDisplay(product){
+  const priceHtml = `<span class="current">${currentDetailPrice.toLocaleString('en-US')} EGP</span>`;
+  document.getElementById('detailPrice').innerHTML = priceHtml;
 }
 
 function renderSlider(){
@@ -1756,15 +1750,22 @@ document.getElementById('detailAddToCartBtn').addEventListener('click', () => {
   const imgSrc = sliderImages[currentSlide] || sliderImages[0];
   const customizationNotes = isCustomized ? document.getElementById('customizationNotes').value : '';
   
-  addToCart(product.id, size, colorName, imgSrc, customizationNotes);
+  let typeName = null;
+  if (product.priceOptions) {
+    const typeSelect = document.getElementById('detailTypeSelect');
+    typeName = product.priceOptions[parseInt(typeSelect.value)].name;
+  }
+  
+  addToCart(product.id, size, colorName, imgSrc, customizationNotes, currentDetailPrice, typeName);
 });
 
-function addToCart(productId, size, color, imageSrc, notes = ''){
+function addToCart(productId, size, color, imageSrc, notes = '', price = null, typeName = null){
   const product = PRODUCTS.find(p => p.id === productId);
   if(!product || product.soldOut) return;
-  const existing = cart.find(c => c.id === productId && c.size === size && c.color === color && c.notes === notes);
+  const itemPrice = price || product.price;
+  const existing = cart.find(c => c.id === productId && c.size === size && c.color === color && c.notes === notes && c.type === typeName);
   if(existing) existing.qty++;
-  else cart.push({ id:product.id, cat:product.cat, price:product.price, img:imageSrc, name:bagName(product), size, color, qty:1, notes });
+  else cart.push({ id:product.id, cat:product.cat, price:itemPrice, img:imageSrc, name:bagName(product), size, color, qty:1, notes, type: typeName });
   renderCart();
   openCart();
 }
@@ -1784,33 +1785,35 @@ function renderCart(){
   if(!cart.length){
     wrap.innerHTML = '<div class="cart-empty">Your cart is empty.<br>Now\'s a good time to add a piece you love.</div>';
     totalEl.textContent = '0 EGP';
-  } else {
-    wrap.innerHTML = cart.map((c,idx) => {
-      const variant = c.color === 'Customized' && c.notes ? 
-        `Size: ${c.size} | Customized: ${c.notes}` : 
-        `Size: ${c.size} | Color: ${c.color}`;
-      return `
-      <div class="cart-item">
-        <img src="${c.img}" alt="${c.name}">
-        <div class="cart-item-info">
-          <h5>${c.name}</h5>
-          <div>${c.price.toLocaleString('en-US')} EGP</div>
-          <div class="variant">${variant}</div>
-          <div class="qty-row">
-            <button class="qty-btn" data-act="dec" data-idx="${idx}">−</button>
-            <span>${c.qty}</span>
-            <button class="qty-btn" data-act="inc" data-idx="${idx}">+</button>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
-    wrap.querySelectorAll('.qty-btn').forEach(btn => {
-      btn.addEventListener('click', () => changeQty(parseInt(btn.dataset.idx), btn.dataset.act==='inc'?1:-1));
-    });
-    totalEl.textContent = cart.reduce((s,c) => s + c.price*c.qty, 0).toLocaleString('en-US') + ' EGP';
+    return;
   }
-  updateWarningBanner();
-  saveCartToStorage();
+  wrap.innerHTML = cart.map((c,idx) => {
+    let variant = '';
+    if (c.type) variant += `Type: ${c.type} | `;
+    if (c.color === 'Customized' && c.notes) {
+      variant += `Size: ${c.size} | Customized: ${c.notes}`;
+    } else {
+      variant += `Size: ${c.size} | Color: ${c.color}`;
+    }
+    return `
+    <div class="cart-item">
+      <img src="${c.img}" alt="${c.name}">
+      <div class="cart-item-info">
+        <h5>${c.name}</h5>
+        <div>${c.price.toLocaleString('en-US')} EGP</div>
+        <div class="variant">${variant}</div>
+        <div class="qty-row">
+          <button class="qty-btn" data-act="dec" data-idx="${idx}">−</button>
+          <span>${c.qty}</span>
+          <button class="qty-btn" data-act="inc" data-idx="${idx}">+</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  wrap.querySelectorAll('.qty-btn').forEach(btn => {
+    btn.addEventListener('click', () => changeQty(parseInt(btn.dataset.idx), btn.dataset.act==='inc'?1:-1));
+  });
+  totalEl.textContent = cart.reduce((s,c) => s + c.price*c.qty, 0).toLocaleString('en-US') + ' EGP';
 }
 
 function openCart(){ document.getElementById('cartDrawer').classList.add('show'); document.getElementById('overlay').classList.add('show'); }
@@ -1818,11 +1821,6 @@ function closeCartFn(){ document.getElementById('cartDrawer').classList.remove('
 document.getElementById('cartBtn').addEventListener('click', openCart);
 document.getElementById('closeCart').addEventListener('click', closeCartFn);
 document.getElementById('overlay').addEventListener('click', ()=>{ closeCartFn(); closeMobileFilter(); });
-
-document.getElementById('continueShoppingBtn').addEventListener('click', () => {
-  closeCartFn();
-  goHome();
-});
 
 const WHATSAPP_NUMBER = '201201828084';
 document.getElementById('checkoutBtn').addEventListener('click', () => {
@@ -1834,7 +1832,9 @@ document.getElementById('checkoutBtn').addEventListener('click', () => {
   const total = cart.reduce((s,c) => s + c.price*c.qty, 0);
   let msg = `Hi, I'd like to confirm the following order from Rubies:\n\n`;
   cart.forEach((c,i) => {
-    msg += `${i+1}) ${c.name}\n   Size: ${c.size} | Color: ${c.color}\n   Qty: ${c.qty}\n   Price: ${(c.price*c.qty).toLocaleString('en-US')} EGP\n`;
+    let details = `   Size: ${c.size} | Color: ${c.color}`;
+    if (c.type) details = `   Type: ${c.type} | ` + details.replace('   ', '');
+    msg += `${i+1}) ${c.name}\n${details}\n   Qty: ${c.qty}\n   Price: ${(c.price*c.qty).toLocaleString('en-US')} EGP\n`;
     if(c.notes) msg += `   Customization: ${c.notes}\n`;
     msg += `\n`;
   });
@@ -1846,13 +1846,10 @@ function openMobileFilter(){ document.getElementById('sidebar').classList.add('s
 function closeMobileFilter(){ document.getElementById('sidebar').classList.remove('show'); if(!document.getElementById('cartDrawer').classList.contains('show')) document.getElementById('overlay').classList.remove('show'); }
 document.getElementById('mobileFilterOpen').addEventListener('click', openMobileFilter);
 
-loadCartFromStorage();
-loadCustomerFields();
 renderHomeSections();
 setupScrollOnce();
 renderCategories();
 renderCart();
-updateWarningBanner();
 </script>
 
 </body>
