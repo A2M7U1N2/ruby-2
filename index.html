@@ -67,6 +67,19 @@
     opacity:0.45;
   }
 
+  /* شريط التحذير من الرفريش */
+  .refresh-warning{
+    background:var(--ruby-deep);
+    color:var(--cream);
+    text-align:center;
+    padding:8px 16px;
+    font-size:0.75rem;
+    display:none;
+    z-index:101;
+    position:relative;
+  }
+  .refresh-warning.show{ display:block; }
+
   .announce{
     background:var(--ruby);
     color:var(--cream);
@@ -1008,6 +1021,10 @@
 </head>
 <body>
 
+<div id="refreshWarning" class="refresh-warning">
+  ⚠️ You have items in your cart. Refreshing the page will clear your customer details but the items will be restored.
+</div>
+
 <div class="announce">
   <div class="announce-track" id="announceTrack"></div>
 </div>
@@ -1329,19 +1346,58 @@ let state = {
 };
 let cart = [];
 
-function beforeUnloadHandler(e) {
-  e.preventDefault();
-  e.returnValue = 'You have items in your cart. Are you sure you want to leave?';
-  return e.returnValue;
+function saveCartToStorage() {
+  localStorage.setItem('rubies_cart', JSON.stringify(cart));
 }
-
-function updateBeforeUnload() {
-  if (cart.length > 0) {
-    window.addEventListener('beforeunload', beforeUnloadHandler);
-  } else {
-    window.removeEventListener('beforeunload', beforeUnloadHandler);
+function loadCartFromStorage() {
+  const saved = localStorage.getItem('rubies_cart');
+  if (saved) {
+    try {
+      cart = JSON.parse(saved);
+      cart.forEach(c => {
+        if (!c.img || c.img === '') {
+          const product = PRODUCTS.find(p => p.id === c.id);
+          if (product && product.img) c.img = product.img;
+        }
+      });
+    } catch(e) {}
   }
 }
+function saveCustomerFields() {
+  const fields = {
+    name: document.getElementById('custName').value,
+    phone: document.getElementById('custPhone').value,
+    address: document.getElementById('custAddress').value
+  };
+  if (fields.name || fields.phone || fields.address) {
+    localStorage.setItem('rubies_customer', JSON.stringify(fields));
+  }
+}
+function loadCustomerFields() {
+  const saved = localStorage.getItem('rubies_customer');
+  if (saved) {
+    try {
+      const fields = JSON.parse(saved);
+      document.getElementById('custName').value = fields.name || '';
+      document.getElementById('custPhone').value = fields.phone || '';
+      document.getElementById('custAddress').value = fields.address || '';
+    } catch(e) {}
+  }
+}
+
+function updateWarningBanner() {
+  const warning = document.getElementById('refreshWarning');
+  if (cart.length > 0) {
+    warning.classList.add('show');
+  } else {
+    warning.classList.remove('show');
+  }
+}
+
+window.addEventListener('beforeunload', () => {
+  saveCartToStorage();
+  saveCustomerFields();
+});
 
 const announceMsgs = ['Free delivery on orders over 1,000 EGP ✨','New arrivals every week 🌸','Free delivery on orders over 1,000 EGP ✨','New arrivals every week 🌸'];
 document.getElementById('announceTrack').innerHTML = [...announceMsgs, ...announceMsgs].map(m => `<span>${m}</span>`).join('');
@@ -1753,7 +1809,8 @@ function renderCart(){
     });
     totalEl.textContent = cart.reduce((s,c) => s + c.price*c.qty, 0).toLocaleString('en-US') + ' EGP';
   }
-  updateBeforeUnload();
+  updateWarningBanner();
+  saveCartToStorage();
 }
 
 function openCart(){ document.getElementById('cartDrawer').classList.add('show'); document.getElementById('overlay').classList.add('show'); }
@@ -1789,10 +1846,13 @@ function openMobileFilter(){ document.getElementById('sidebar').classList.add('s
 function closeMobileFilter(){ document.getElementById('sidebar').classList.remove('show'); if(!document.getElementById('cartDrawer').classList.contains('show')) document.getElementById('overlay').classList.remove('show'); }
 document.getElementById('mobileFilterOpen').addEventListener('click', openMobileFilter);
 
+loadCartFromStorage();
+loadCustomerFields();
 renderHomeSections();
 setupScrollOnce();
 renderCategories();
 renderCart();
+updateWarningBanner();
 </script>
 
 </body>
