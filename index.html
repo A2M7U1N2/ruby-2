@@ -556,7 +556,7 @@
     position:relative;
     overflow:hidden;
     border-radius:18px;
-    touch-action:pan-y pinch-zoom;
+    touch-action:pan-y; /* اسمح بالتمرير العمودي فقط بشكل افتراضي */
   }
   .slider-track{
     display:flex;
@@ -1539,9 +1539,6 @@ let currentDetailSelectedColor = 0;
 let isCustomized = false;
 let sliderImages = [];
 let currentSlide = 0;
-let touchStartX = 0;
-let touchEndX = 0;
-let isSwiping = false;
 
 function openProductPage(product){
   currentDetailProduct = product;
@@ -1566,12 +1563,10 @@ function openProductPage(product){
     return `<button class="detail-color-swatch ${selectedClass}" style="background:${COLORS[colorIdx].hex}" data-color="${colorIdx}" title="${COLORS[colorIdx].name}"></button>`;
   }).join('');
   
-  // إعادة ضبط خيار التخصيص
   document.getElementById('customizedCheck').classList.remove('checked');
   document.getElementById('customizationNotes').style.display = 'none';
   document.getElementById('customizationNotes').value = '';
   
-  // تجهيز الصور
   if(product.extraImages && product.extraImages.length > 0){
     sliderImages = product.extraImages;
   } else {
@@ -1600,7 +1595,6 @@ function openProductPage(product){
     });
   });
   
-  // حدث خيار التخصيص
   document.getElementById('customizedOption').onclick = () => {
     isCustomized = !isCustomized;
     const check = document.getElementById('customizedCheck');
@@ -1635,35 +1629,30 @@ function renderSlider(){
       updateSliderPosition();
     });
   });
-  
-  // إزالة الأحداث السابقة لتجنب التراكم
-  track.removeEventListener('touchstart', onTouchStart);
-  track.removeEventListener('touchend', onTouchEnd);
-  track.removeEventListener('touchmove', onTouchMove);
-  
-  track.addEventListener('touchstart', onTouchStart, {passive: false});
-  track.addEventListener('touchend', onTouchEnd, {passive: false});
-  track.addEventListener('touchmove', onTouchMove, {passive: false});
+
+  // استخدام approach جديد: لمسة واحدة تحسب الفرق وتحرك
+  const container = document.getElementById('sliderContainer');
+  container.removeEventListener('touchstart', onSliderTouchStart);
+  container.removeEventListener('touchend', onSliderTouchEnd);
+  container.addEventListener('touchstart', onSliderTouchStart, {passive: true});
+  container.addEventListener('touchend', onSliderTouchEnd, {passive: false});
 }
 
-function onTouchStart(e){
-  touchStartX = e.changedTouches[0].screenX;
-  isSwiping = false;
+let sliderTouchStartX = 0;
+function onSliderTouchStart(e) {
+  sliderTouchStartX = e.changedTouches[0].screenX;
 }
-
-function onTouchMove(e){
-  // منع التمرير العمودي أثناء السحب الأفقي
-  const touchCurrentX = e.changedTouches[0].screenX;
-  const diffX = Math.abs(touchCurrentX - touchStartX);
-  if(diffX > 10){
-    e.preventDefault();
-    isSwiping = true;
+function onSliderTouchEnd(e) {
+  const diff = sliderTouchStartX - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > 40) {
+    e.preventDefault(); // نمنع السلوك الافتراضي فقط إذا كان هناك سحب أفقي واضح
+    if (diff > 0 && currentSlide < sliderImages.length - 1) {
+      currentSlide++;
+    } else if (diff < 0 && currentSlide > 0) {
+      currentSlide--;
+    }
+    updateSliderPosition();
   }
-}
-
-function onTouchEnd(e){
-  touchEndX = e.changedTouches[0].screenX;
-  if(isSwiping) handleSwipe();
 }
 
 function updateSliderPosition(){
@@ -1672,18 +1661,6 @@ function updateSliderPosition(){
   document.querySelectorAll('.slider-dot').forEach((dot, i) => {
     dot.classList.toggle('active', i === currentSlide);
   });
-}
-
-function handleSwipe(){
-  const diff = touchStartX - touchEndX;
-  if(Math.abs(diff) > 40){
-    if(diff > 0 && currentSlide < sliderImages.length - 1){
-      currentSlide++;
-    } else if(diff < 0 && currentSlide > 0){
-      currentSlide--;
-    }
-    updateSliderPosition();
-  }
 }
 
 document.getElementById('backToShopBtn').addEventListener('click', () => {
